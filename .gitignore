@@ -42,6 +42,8 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *,cover
+.testrepository
+.venv
 
 # Translations
 *.mo
@@ -55,3 +57,28 @@ docs/_build/
 
 # PyBuilder
 target/
+# Packages
+*.egg
+*.egg-info
+bin
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# Complexity
+output/*.html
+output/*/index.html
+
+# Sphinx
+doc/build
+
+# pbr generates these
+AUTHORS
+ChangeLog
+
+# Editors
+*~
+.*.swp
+.*sw?
