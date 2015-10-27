@@ -1,0 +1,31 @@
+# * Need to document the two channels of data, and confirm that they
+#   make sense 
+# * Implement authorisation.  Recommendation: we determine if a
+#   compute service can bind a port, not Nova or Neutron, based on its
+#   tenancy and ownership properties.  Actual validation can be a part
+#   of the network backend.  Additionally, Gluon requires checking of
+#   the credentials of services themselves to confirm that they are
+#   system functions permitted to bind and unbind ports.
+# * Binding data is being manipulated in Neutron driver - that's
+#   something we should address in nova and neutron rather than
+#   fudging it here.  Largely the problem is that binding properties
+#   are guessed at in the Neutron plugin in Nova and we have taken
+#   that responsibility into the driver in order to make it work
+# * VIF type negotiation would be a good idea at this point - we don't
+#   know what VIF types nova will accept; Neutron guesses as it always
+#   has and this is a problem for misconfiguration, especially as
+#   services on both sides multiply
+# * IP addresses are not made available to Nova due to small
+#   brokenness; also, Nova needs to be aware that they may become
+#   available very late, after binding (new notification?)
+# * devstack is not writing the gluon config file correctly, it
+#   requires hand editing
+# * No persistent database
+# * Notifications on port state changes should be passed from the network
+#   service to the compute service via Gluon.  (This is a 1:1 mapping as
+#   only owners of bound ports get notified.)
+# * We should make more use of Keystone to advertise ourselves and to
+#   work with network services (they shouldn't have to register with us when
+#   we already have a service discovery system).
+# * We should become a lookup point for backends that provide specific
+#   features, or work out how Keystone could be used for that purpose.
