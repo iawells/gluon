@@ -14,17 +14,17 @@ name=gluon
 # The server
 
 GITREPO['gluon']=${GLUON_REPO:-https://github.com/iawells/gluon.git}
-GITBRANCH['gluon']=${GLUON_BRANCH:-stable/liberty}
+GITBRANCH['gluon']=${GLUON_BRANCH:-demo}
 GITDIR['gluon']=$DEST/gluon
 
 # The client API libraries
 GITREPO['gluonlib']=${GLUONLIB_REPO:-https://github.com/iawells/gluonlib.git}
-GITBRANCH['gluonlib']=${GLUONLIB_BRANCH:-stable/liberty}
+GITBRANCH['gluonlib']=${GLUONLIB_BRANCH:-master}
 GITDIR['gluonlib']=$DEST/gluonlib
 
 # The Nova client plugin
 GITREPO['gluon-nova']=${GLUON_NOVA_REPO:-https://github.com/iawells/gluon-nova.git}
-GITBRANCH['gluon-nova']=${GLUON_NOVA_BRANCH:-stable/liberty}
+GITBRANCH['gluon-nova']=${GLUON_NOVA_BRANCH:-master}
 GITDIR['gluon-nova']=$DEST/gluon-nova
 
 function pre_install_me {
