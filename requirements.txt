@@ -8,3 +8,5 @@ requests
 stevedore
 six
 logging
+Flask
+flask-restful
