@@ -24,7 +24,7 @@ LOG = logging.getLogger(__name__)
 
 
 @base.GluonObjectRegistry.register
-class Port(base.GlounObject, base.GluonObjectDictCompat):
+class Port(base.GluonObject, base.GluonObjectDictCompat):
 
     VERSION = '1.0'
 

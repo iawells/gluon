@@ -38,7 +38,7 @@ cfg.CONF.register_opts(sql_opts, 'database')
 db_options.set_defaults(cfg.CONF, _DEFAULT_SQL_CONNECTION, 'gluon.sqlite')
 
 
-class GlounBase(models.ModelBase):
+class GluonBase(models.ModelBase):
 
     def save(self, session=None):
         import gluon.db.sqlalchemy.api as db_api
@@ -46,10 +46,10 @@ class GlounBase(models.ModelBase):
         if session is None:
             session = db_api.get_session()
 
-        super(GlounBase, self).save(session)
+        super(GluonBase, self).save(session)
 
 # (enikher): for unittest
-Base = declarative_base(cls=GlounBase)
+Base = declarative_base(cls=GluonBase)
 
 
 class Port(Base):

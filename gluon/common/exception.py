@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Gloun base exception handling.
+"""Gluon base exception handling.
 
 Includes decorator for re-raising Cloudpulse-type exceptions.
 

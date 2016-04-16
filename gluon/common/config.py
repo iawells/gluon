@@ -17,7 +17,7 @@ from oslo_config import cfg
 API_SERVICE_OPTS = [
     cfg.IntOpt('port',
                default=1234,
-               help='The port for the gloun API server'),
+               help='The port for the gluon API server'),
     cfg.StrOpt('host',
                default='127.0.0.1',
                help='The listen IP for the gluon API server'),

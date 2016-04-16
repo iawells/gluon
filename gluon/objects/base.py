@@ -15,7 +15,7 @@
 from oslo_versionedobjects import base as ovoo_base
 
 
-class GlounObject(ovoo_base.VersionedObject):
+class GluonObject(ovoo_base.VersionedObject):
     pass
 
 
