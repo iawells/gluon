@@ -21,6 +21,7 @@ from oslo_config import cfg
 from sqlalchemy import schema
 from sqlalchemy import (Column, Integer, String)
 from sqlalchemy.ext.declarative import declarative_base
+from gluon.common import models as common_models
 from gluon.common import paths
 
 sql_opts = [
@@ -51,14 +52,6 @@ class GluonBase(models.ModelBase):
 # (enikher): for unittest
 Base = declarative_base(cls=GluonBase)
 
+mp = common_models.mp()
 
-class Port(Base):
-    """Represents gluon port"""
-
-    __tablename__ = 'port'
-    __table_args__ = (
-        schema.UniqueConstraint('uuid', name='uniq_port0uuid'),
-        )
-
-    id = Column(Integer, primary_key=True)
-    uuid = Column(String(36))
+mp.sqla_models(Base)
