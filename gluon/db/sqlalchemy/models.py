@@ -21,6 +21,7 @@ from oslo_config import cfg
 from sqlalchemy import schema
 from sqlalchemy import (Column, Integer, String)
 from sqlalchemy.ext.declarative import declarative_base
+from gluon.common import models as common_models
 from gluon.common import paths
 
 sql_opts = [
@@ -59,29 +60,6 @@ class GluonBase(models.TimestampMixin, models.ModelBase):
 
 Base = declarative_base(cls=GluonBase)
 
+mp = common_models.mp()
 
-class Port(Base):
-    """Represents gluon port"""
-
-    __tablename__ = 'ports'
-    __table_args__ = (
-        schema.UniqueConstraint('uuid', name='uniq_port0uuid'),
-        schema.ForeignKeyConstraint(['backend_name'], ['backends.name'],
-                                    ondelete='CASCADE')
-        )
-
-    uuid = Column(String(64))
-    backend_name = Column(String(64))
-
-
-class Backend(Base):
-    """Represents gluon Backend"""
-
-    __tablename__ = 'backends'
-    __table_args__ = (
-        schema.UniqueConstraint('name', name='uniq_port0name'),
-        )
-
-    name = Column(String(255))
-    service_type = Column(String(255))
-    url = Column(String(255))
+mp.sqla_models(Base)
