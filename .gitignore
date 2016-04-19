@@ -83,3 +83,7 @@ ChangeLog
 .*.swp
 .*sw?
 /.settings
+
+gluon/gluon.sqlite
+gluon/clean.sqlite
+/*.patch

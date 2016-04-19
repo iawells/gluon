@@ -12,17 +12,24 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import sqlalchemy.orm.exc
+
 from oslo_utils import uuidutils
 from oslo_db import exception as db_exc
 from oslo_db.sqlalchemy import session as db_session
+from oslo_db.sqlalchemy import utils as db_utils
 from oslo_config import cfg
+from oslo_log import log as logging
 
 from gluon.db import api
-from gluon.db.sqlalchemy import models
+from gluon.db.sqlalchemy import models as sql_models
 from gluon.common import exception
+
 CONF = cfg.CONF
 
 _FACADE = None
+
+LOG = logging.getLogger(__name__)
 
 
 def _create_facade_lazily():
@@ -47,23 +54,72 @@ def get_backend():
     return Connection()
 
 
+def model_query(model, *args, **kwargs):
+    """Query helper for simpler session usage.
+
+    :param session: if present, the session to use
+    """
+
+    session = kwargs.get('session') or get_session()
+    query = session.query(model, *args)
+    return query
+
+
+def _paginate_query(model, limit=None, marker=None, sort_key=None,
+                    sort_dir=None, query=None):
+    if not query:
+        query = model_query(model)
+    sort_keys = ['id']
+    if sort_key and sort_key not in sort_keys:
+        sort_keys.insert(0, sort_key)
+    query = db_utils.paginate_query(query, model, limit, sort_keys,
+                                    marker=marker, sort_dir=sort_dir)
+    return query.all()
+
+
 class Connection(api.Connection):
 
     """SqlAlchemy connection."""
 
+    # TODO: this should not be done!!! a database should be created and then
+    # migration should be triggered.
+    LOG.error("models.Base.metadata.create_all(get_engine()) is still called"
+              " this should not be done - migration should be triggered")
+    sql_models.Base.metadata.create_all(get_engine())
+
+    models = sql_models
+
     def __init__(self):
         pass
 
-    def create_port(self, values):
+    def create(self, model, values):
 
         # ensure defaults are present for new tests
         if not values.get('uuid'):
             values['uuid'] = uuidutils.generate_uuid()
 
-        port = models.Port()
-        port.update(values)
+        obj = model()
+        obj.update(values)
         try:
-            port.save()
+            obj.save()
         except db_exc.DBDuplicateEntry:
-            raise exception.PortAlreadyExists(uuid=values['uuid'])
-        return port
+            raise exception.AlreadyExists(uuid=values['uuid'],
+                                          cls=model.__name__)
+        return obj
+
+    def get_list(self, model, filters=None, limit=None, marker=None,
+                      sort_key=None, sort_dir=None, failed=None, period=None):
+        query = model_query(model)
+        #query = self._add_filters(query, filters)
+        #query = self._add_period_filter(query, period)
+        #query = self._add_failed_filter(query, failed)
+        return _paginate_query(model, limit, marker,
+                               sort_key, sort_dir, query)
+
+    def get_by_uuid(self, model, uuid):
+        query = model_query(model)
+        query = query.filter_by(uuid=uuid)
+        try:
+            return query.one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            raise exception.NotFound(cls=model.__name__, uuid=uuid)

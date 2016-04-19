@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 #
-# Copyright � 2012 New Dream Network, LLC (DreamHost)
+# Copyright ï¿½ 2012 New Dream Network, LLC (DreamHost)
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -21,8 +21,8 @@ import wsmeext.pecan as wsme_pecan
 
 from gluon.api import base
 from gluon.api import link
-# TODO enikher
-# from cloudpulse.api.controllers import v1
+
+from gluon.api.controller.v1.base import API as v1
 
 
 class Version(base.APIBase):
@@ -76,8 +76,7 @@ class RootController(rest.RestController):
     _default_version = 'v1'
     """The default API version"""
 
-    # TODO: include rest api
-    # v1 = v1.Controller()
+    v1 = v1()
 
     @wsme_pecan.wsexpose(Root)
     def get(self):

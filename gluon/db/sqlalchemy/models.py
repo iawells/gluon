@@ -38,7 +38,13 @@ cfg.CONF.register_opts(sql_opts, 'database')
 db_options.set_defaults(cfg.CONF, _DEFAULT_SQL_CONNECTION, 'gluon.sqlite')
 
 
-class GluonBase(models.ModelBase):
+class GluonBase(models.TimestampMixin, models.ModelBase):
+
+    def as_dict(self):
+        d = {}
+        for c in self.__table__.columns:
+            d[c.name] = self[c.name]
+        return d
 
     def save(self, session=None):
         import gluon.db.sqlalchemy.api as db_api
@@ -48,17 +54,31 @@ class GluonBase(models.ModelBase):
 
         super(GluonBase, self).save(session)
 
-# (enikher): for unittest
+
 Base = declarative_base(cls=GluonBase)
 
 
 class Port(Base):
     """Represents gluon port"""
 
-    __tablename__ = 'port'
+    __tablename__ = 'ports'
     __table_args__ = (
         schema.UniqueConstraint('uuid', name='uniq_port0uuid'),
         )
 
     id = Column(Integer, primary_key=True)
-    uuid = Column(String(36))
+    uuid = Column(String(64))
+
+class Backend(Base):
+    """Represents gluon Backend"""
+
+    __tablename__ = 'backends'
+    __table_args__ = (
+        schema.UniqueConstraint('uuid', name='uniq_port0uuid'),
+        )
+
+    id = Column(Integer, primary_key=True)
+    uuid = Column(String(64))
+    name = Column(String(255))
+    service_type = Column(String(255))
+    url = Column(String(255))

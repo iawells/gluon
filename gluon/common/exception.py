@@ -92,5 +92,10 @@ class Conflict(GluonException):
     code = 409
 
 
-class PortAlreadyExists(Conflict):
-    message = _("A port with UUID %(uuid)s already exists.")
+class AlreadyExists(Conflict):
+    message = _("Object of %(cls)s with UUID %(uuid)s already exists.")
+
+
+class NotFound(GluonException):
+    code = 404
+    message = _("Object of %(cls)s with UUID %(uudi)s not found.")

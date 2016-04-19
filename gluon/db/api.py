@@ -27,6 +27,10 @@ def get_instance():
     return IMPL
 
 
+def get_models():
+    return IMPL.models
+
+
 @six.add_metaclass(abc.ABCMeta)
 class Connection(object):
 
@@ -35,9 +39,10 @@ class Connection(object):
         """Constructor."""
 
     @abc.abstractmethod
-    def create_port(self, values):
-        """Create a new port.
+    def create(self, model, values):
+        """Create a new gluon object from model.
 
+        :param model: Class of the object which should be created
         :param values: A dict containing several items used to identify
                        and track the port, and several dicts which are passed
                        into the Drivers when managing this port. For example:
@@ -50,3 +55,35 @@ class Connection(object):
                         }
         :returns: A port.
         """
+
+    @abc.abstractmethod
+    def get_list(self, model, columns=None, filters=None, limit=None,
+                 marker=None, sort_key=None, sort_dir=None,
+                 failed=None, period=None):
+        """Get specific columns for matching model.
+
+        Return a list of the specified columns for all tess that match the
+        specified filters.
+
+        :param model: Class of the object which should be listed
+        :param columns: List of column names to return.
+                        Defaults to 'id' column when columns == None.
+        :param filters: Filters to apply. Defaults to None.
+
+        :param limit: Maximum number of tests to return.
+        :param marker: the last item of the previous page; we return the next
+                       result set.
+        :param sort_key: Attribute by which results should be sorted.
+        :param sort_dir: direction in which results should be sorted.
+                         (asc, desc)
+        :returns: A list of tuples of the specified columns.
+        """
+
+    @abc.abstractmethod
+    def get_by_uuid(self, model, uuid):
+        """Return an object of model.
+
+        :param uuid: The uuid of a object.
+        :returns: an object of model.
+        """
+
