@@ -74,11 +74,9 @@ class Backend(Base):
 
     __tablename__ = 'backends'
     __table_args__ = (
-        schema.UniqueConstraint('uuid', name='uniq_port0uuid'),
+        schema.UniqueConstraint('name', name='uniq_port0name'),
         )
 
-    id = Column(Integer, primary_key=True)
-    uuid = Column(String(64))
-    name = Column(String(255))
+    name = Column(String(255), primary_key=True)
     service_type = Column(String(255))
     url = Column(String(255))

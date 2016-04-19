@@ -107,10 +107,19 @@ class Connection(api.Connection):
                                           cls=model.__name__)
         return obj
 
+    def _add_filters(self, query, filters):
+        if filters is None:
+            filters = {}
+
+        for (key, value) in filters.iteritems():
+            query = query.filter_by(**{key: value})
+
+        return query
+
     def get_list(self, model, filters=None, limit=None, marker=None,
-                      sort_key=None, sort_dir=None, failed=None, period=None):
+                 sort_key=None, sort_dir=None, failed=None, period=None):
         query = model_query(model)
-        #query = self._add_filters(query, filters)
+        query = self._add_filters(query, filters)
         #query = self._add_period_filter(query, period)
         #query = self._add_failed_filter(query, failed)
         return _paginate_query(model, limit, marker,

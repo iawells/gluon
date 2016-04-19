@@ -41,27 +41,6 @@ class Port(base.APIBase):
             setattr(self, field, real_obj_port_dic.get(field, wtypes.Unset))
 
 
-class PortController(rest.RestController):
-    """Version 1 API port controller."""
-
-    @wsme_pecan.wsexpose(Port, types.uuid)
-    def get(self, uuid):
-        """Returns information about the given port.
-
-        :param uuid: UUID of a port.
-        """
-        return Port(DB_Port().get_by_uuid(uuid))
-
-    @wsme_pecan.wsexpose(Port, body=Port, status_code=201)
-    def post(self, port):
-        """Create a new Port.
-
-        :param port: a port within the request body.
-        """
-
-        DB_Port.from_dict_object(port.as_dict()).create()
-
-
 class PortList(base.APIBase):
 
     ports = [Port]
@@ -70,14 +49,22 @@ class PortList(base.APIBase):
         setattr(self, 'ports', [Port(port) for port in port_list])
 
 
-class PortListController(rest.RestController):
-    """Version 1 API portCollection controller."""
+class PortController(rest.RestController):
+    """Version 1 API port controller."""
 
     @wsme_pecan.wsexpose(PortList)
-    def get(self):
+    def get_all(self):
         """Retrieve list of all ports.
 
         :param port_ident: UUID of a port.
         """
         return PortList(DB_Port.list())
+
+    @wsme_pecan.wsexpose(Port, types.uuid)
+    def get_one(self, uuid):
+        """Returns information about the given port.
+
+        :param uuid: UUID of a port.
+        """
+        return Port(DB_Port().get_by_uuid(uuid))
 

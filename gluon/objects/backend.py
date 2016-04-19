@@ -14,17 +14,20 @@
 from oslo_log import log as logging
 from gluon.objects import base
 from gluon.db import api as dbapi
+from oslo_versionedobjects import fields
 
 LOG = logging.getLogger(__name__)
 
 
 @base.GluonObjectRegistry.register
-class Port(base.GlounObject, base.GluonObjectDictCompat):
+class Backend(base.GluonObject, base.GluonObjectDictCompat):
 
     VERSION = '1.0'
     model = dbapi.get_models().Backend
 
     fields = {
               'id': fields.IntegerField(),
-              'uuid': fields.UUIDField(nullable=False),
+              'name': fields.StringField(),
+              'service_type': fields.StringField(),
+              'url': fields.StringField()
               }

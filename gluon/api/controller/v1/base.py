@@ -21,6 +21,7 @@ from gluon.api.base import APIBase
 from gluon.api.controller.v1 import port as portAPI
 from gluon.api.controller.v1 import backend as backendAPI
 
+
 class V1(APIBase):
     """The representation of the version 1 of the API."""
 
@@ -52,9 +53,8 @@ class V1(APIBase):
 class API(rest.RestController):
     """Version 1 API controller root."""
 
-    port = portAPI.PortController()
-    ports = portAPI.PortListController()
-    backend = backendAPI.BackendController()
+    ports = portAPI.PortController()
+    backends = backendAPI.BackendController()
 
     @wsme_pecan.wsexpose(V1)
     def get(self):

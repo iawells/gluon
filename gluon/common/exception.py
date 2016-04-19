@@ -98,4 +98,9 @@ class AlreadyExists(Conflict):
 
 class NotFound(GluonException):
     code = 404
-    message = _("Object of %(cls)s with UUID %(uudi)s not found.")
+    message = _("Object of %(cls)s with UUID %(uuid)s not found.")
+
+
+class NotCreateAble(GluonException):
+    code = 409
+    message = _("An object of type %(type)s cannot be created for %(object)s")

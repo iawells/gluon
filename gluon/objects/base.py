@@ -54,8 +54,8 @@ class GluonObject(ovoo_base.VersionedObject):
     @classmethod
     def get_by_uuid(cls, uuid):
         return cls.from_dict_object(cls(),
-                                   cls.db_instance.get_by_uuid(cls.model,
-                                                               uuid))
+                                    cls.db_instance.get_by_uuid(cls.model,
+                                                                uuid))
 
     @staticmethod
     def from_dict_object(cls, dict):

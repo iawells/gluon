@@ -19,6 +19,7 @@
 from oslo_utils import strutils
 from oslo_utils import uuidutils
 import wsme
+import six
 from wsme import types as wtypes
 
 from gluon.common import exception
@@ -126,6 +127,22 @@ class MultiType(wtypes.UserType):
             raise ValueError(_("Expected '%(type)s', got '%(value)s'")
                              % {'type': self.types, 'value': type(value)})
 
+ 
+class Text(wtypes.UserType):
+    basetype = six.text_type
+    name = 'text'
+    # FIXME(lucasagomes): When used with wsexpose decorator WSME will try
+    # to get the name of the type by accessing it's __name__ attribute.
+    # Remove this __name__ attribute once it's fixed in WSME.
+    # https://bugs.launchpad.net/wsme/+bug/1265590
+    __name__ = name
+
+    @staticmethod
+    def validate(value):
+        if isinstance(value, basestring):
+            return
+        raise ValueError(_("Expected String, got '%s'" % value)) 
+    
 
 uuid = UuidType()
 name = NameType()
