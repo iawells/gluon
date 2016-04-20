@@ -1,0 +1,62 @@
+# This is the minimum required port for Gluon-connectivity to work.
+ProtonBasePort:
+    attributes:
+        id:
+            type: uuid
+            required: True
+            primary: 'True'
+        mac_address:
+            type: 'string'
+            length: 17
+            required: True
+            validate: mac_address
+        admin_state_up:
+            type: 'enum'
+            required: True
+            values:
+                - 'UP'
+                - 'DOWN'
+        status:
+            type: 'enum'
+            required: True
+            values:
+                - 'ACTIVE'
+                - 'DOWN'
+        vnic_type:
+            type: enum
+            required: true
+            values:
+               - 'virtual'
+               - 'direct'
+               - 'macvtap'
+               - 'sriov'
+               - 'whole-dev'
+        host_id:
+            type: 'string'
+            length: 32
+        vif_details:
+            type: 'string' # what are we going to use, JSON?
+            length: 32
+        vif_type:
+            type: 'string'
+            length: 32
+        ipaddress:
+            type: 'string'
+            length: 64
+            validate: 'ipv4address'
+        subnet_prefix:
+            type: 'integer'
+            values:
+                - '1-31'
+        gateway:
+            type: 'string'
+            length: 64
+            validate: 'ipv4address'
+        mtu:
+            type: 'integer'
+            required: True
+        vlan_transparency:
+            type: 'boolean'
+            required: True
+        tenant_id:
+            type: 'uuid'
