@@ -14,7 +14,6 @@
 
 import sqlalchemy.orm.exc
 
-from oslo_utils import uuidutils
 from oslo_db import exception as db_exc
 from oslo_db.sqlalchemy import session as db_session
 from oslo_db.sqlalchemy import utils as db_utils
@@ -93,18 +92,15 @@ class Connection(api.Connection):
         pass
 
     def create(self, model, values):
-
-        # ensure defaults are present for new tests
-        if not values.get('uuid'):
-            values['uuid'] = uuidutils.generate_uuid()
-
         obj = model()
         obj.update(values)
         try:
             obj.save()
-        except db_exc.DBDuplicateEntry:
-            raise exception.AlreadyExists(uuid=values['uuid'],
-                                          cls=model.__name__)
+        except db_exc.DBDuplicateEntry as e:
+            raise exception.AlreadyExists(
+                 key=e.__dict__['columns'][0],
+                 value=values[e.__dict__['columns'][0]],
+                 cls=model.__name__)
         return obj
 
     def _add_filters(self, query, filters):

@@ -26,8 +26,8 @@ class Backend(base.GluonObject, base.GluonObjectDictCompat):
     model = dbapi.get_models().Backend
 
     fields = {
-              'id': fields.IntegerField(),
               'name': fields.StringField(),
               'service_type': fields.StringField(),
               'url': fields.StringField()
               }
+

@@ -11,9 +11,6 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-import logging as log
-log.basicConfig(level=log.DEBUG)
-
 from pecan import rest
 from oslo_log import log as logging
 import wsmeext.pecan as wsme_pecan
@@ -22,42 +19,44 @@ from gluon.api import base
 from wsme import types as wtypes
 from gluon.api.controller.v1 import types
 from gluon.objects.backend import Backend as DB_Backend
-from gluon.api.controller.v1.port import Port
+from gluon.api.controller.v1.port import Port, PortController
 from gluon.common import exception
 from gluon.core.manager import gluon_core_manager
 
 LOG = logging.getLogger(__name__)
 
-class Backend(base.APIBase):
+
+class Backend(base.APIBaseObject):
     """API representation of a Backend.
 
     This class enforces type checking and value constraints, and converts
-    between the internal object model and the API representation of a port.
+    between the internal object model and the API representation of a Backend.
     """
 
     name = wtypes.StringType()
     service_type = wtypes.StringType()
     url = wtypes.StringType()
 
-    def __init__(self, obj_port):
-        real_obj_port_dic = obj_port.as_dict()
-        for field in DB_Backend.fields:
-            # Skip fields we do not expose.
-            if not hasattr(self, field):
-                continue
-            setattr(self, field, real_obj_port_dic.get(field, wtypes.Unset))
+    _DB_object_class = DB_Backend
 
 
-class BackendList(base.APIBase):
+class BackendList(base.APIBaseList):
+
     backends = [Backend]
 
-    def __init__(self, backend_list):
-        setattr(self, 'backends', [Backend(backend)
-                                   for backend in backend_list])
+    @classmethod
+    def build(cls, db_obj_list):
+        obj = cls()
+        setattr(obj, 'backends',
+                [Backend.build(db_obj)
+                 for db_obj in db_obj_list])
+        return obj
 
 
 class BackendController(rest.RestController):
-    """Version 1 API port controller."""
+    """Version 1 API Backend controller."""
+
+    ports = PortController()
 
     @wsme_pecan.wsexpose(BackendList)
     def get_all(self):
@@ -65,7 +64,7 @@ class BackendController(rest.RestController):
 
         :param uuid: UUID of a port.
         """
-        return BackendList(DB_Backend().list())
+        return BackendList.build(DB_Backend().list())
 
     @wsme_pecan.wsexpose(Backend, types.uuid)
     def get_one(self, uuid):
@@ -75,22 +74,8 @@ class BackendController(rest.RestController):
         """
         return Backend(DB_Backend().get_by_uuid(uuid))
 
-    #@wsme.signature(Backend, body=Backend,
-    #                     status_code=201)
-    #def create_backend(self, data):
-    #    gluon_core_manager.create_backend(name, service_type, url)
-
-    @wsme_pecan.wsexpose(Port, types.uuid, wtypes.Enum(str, 'ports'), types.uuid)
-    def post(self, backend_id, object_type, id):
-        """Create a new object of object_type.
-
-        :param backend_id: The backend to create this object.
-        :param object_type: Which kind of object shall be created. Possible:
-                            [Ports,]
-        """
-        if object_type == 'ports':
-            gluon_core_manager.create_port(backend_id, id)
-            # TODO return port
-        else:
-            raise exception.NotCreateAble(type=object_type,
-                                          object='Backends')
+    @wsme_pecan.wsexpose(Backend, body=Backend, template='json',
+                         status_code=201)
+    def post(self, body):
+        # Create a backend
+        return Backend.build(gluon_core_manager.create_backend(body.to_db_object())

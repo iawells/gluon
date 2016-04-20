@@ -13,6 +13,7 @@
 #    under the License.
 from oslo_versionedobjects import fields
 from oslo_log import log as logging
+from oslo_utils import uuidutils
 
 from gluon.objects import base
 from gluon.db import api as dbapi
@@ -28,7 +29,11 @@ class Port(base.GluonObject, base.GluonObjectDictCompat):
     model = dbapi.get_models().Port
 
     fields = {
-              'id': fields.IntegerField(),
               'uuid': fields.UUIDField(nullable=False),
+              'backend_name': fields.StringField()
               }
 
+    def create(self):
+        if not getattr(self, 'uuid'):
+            self.uuid = uuidutils.generate_uuid()
+        super(Port, self).create()

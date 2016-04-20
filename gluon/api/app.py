@@ -20,7 +20,7 @@ import pecan
 app_dic = {
            'root': 'gluon.api.root.RootController',
            'modules': ['gluon.api'],
-           'debug': False,
+           'debug': True,
 # TODO (enikher) HOOKS
 #    'hooks': [
 #        hooks.ContextHook(),

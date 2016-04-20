@@ -40,6 +40,8 @@ db_options.set_defaults(cfg.CONF, _DEFAULT_SQL_CONNECTION, 'gluon.sqlite')
 
 class GluonBase(models.TimestampMixin, models.ModelBase):
 
+    id = Column(Integer, primary_key=True)
+
     def as_dict(self):
         d = {}
         for c in self.__table__.columns:
@@ -66,8 +68,8 @@ class Port(Base):
         schema.UniqueConstraint('uuid', name='uniq_port0uuid'),
         )
 
-    id = Column(Integer, primary_key=True)
     uuid = Column(String(64))
+
 
 class Backend(Base):
     """Represents gluon Backend"""
@@ -77,6 +79,6 @@ class Backend(Base):
         schema.UniqueConstraint('name', name='uniq_port0name'),
         )
 
-    name = Column(String(255), primary_key=True)
+    name = Column(String(255))
     service_type = Column(String(255))
     url = Column(String(255))

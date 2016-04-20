@@ -22,31 +22,28 @@ from gluon.objects.port import Port as DB_Port
 from gluon.core.manager import gluon_core_manager
 
 
-class Port(base.APIBase):
+class Port(base.APIBaseObject):
     """API representation of a port.
 
     This class enforces type checking and value constraints, and converts
     between the internal object model and the API representation of a port.
     """
 
-    id = wtypes.IntegerType(minimum=1)
     uuid = types.uuid
-
-    def __init__(self, obj_port):
-        real_obj_port_dic = obj_port.as_dict()
-        for field in DB_Port.fields:
-            # Skip fields we do not expose.
-            if not hasattr(self, field):
-                continue
-            setattr(self, field, real_obj_port_dic.get(field, wtypes.Unset))
+    _DB_object_class = DB_Port
 
 
-class PortList(base.APIBase):
+class PortList(base.APIBaseList):
 
     ports = [Port]
 
-    def __init__(self, port_list):
-        setattr(self, 'ports', [Port(port) for port in port_list])
+    @classmethod
+    def build(cls, db_obj_list):
+        obj = cls()
+        setattr(obj, 'ports',
+                [Port.build(db_obj)
+                 for db_obj in db_obj_list])
+        return obj
 
 
 class PortController(rest.RestController):
@@ -68,3 +65,13 @@ class PortController(rest.RestController):
         """
         return Port(DB_Port().get_by_uuid(uuid))
 
+    @wsme_pecan.wsexpose(Port, unicode,
+                         body=Port, template='json',
+                         status_code=201)
+    def post(self, backend_name, body):
+        """Create a new object of port.
+
+        :param backend_name: The backend to create this port.
+        """
+        return Port.build(gluon_core_manager.create_port(backend_name,
+                                                         body.to_db_object()))

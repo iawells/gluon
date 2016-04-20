@@ -43,19 +43,13 @@ class Manager():
         if backend is None and service is None:
             return port
 
-    def create_port(self, backend_id, uuid):
-        LOG.debug('Creating a new port for backend %s' % backend_id)
-        self.abort_if_backend_doesnt_exist(backend_id)
-        port = DB_Port()
-        port.uuid = id
-        port.backend = backend_id
+    def create_port(self, backend_name, port):
+        LOG.debug('Creating a new port for backend %s' % backend_name)
+        backend = DB_Backend.get_by_name(backend_name)
+        if not backend:
+            raise exception.BackendDoesNotExsist(name=backend_name)
+        port.backend = backend
         port.create()
-
-    def backend_exsists(self, name):
-        if DB_Backend().list(filters={'name': name}):
-            return True
-        return False
-    #def abort_if_backend_doesnt_exist(self, bac):
 
     def create_backend(self, name, service_type, url):
         new_backend = DB_Backend()
@@ -63,5 +57,6 @@ class Manager():
         new_backend.service_type = service_type
         new_backend.url = url
         new_backend.create()
+        return new_backend
 
 gluon_core_manager = Manager()

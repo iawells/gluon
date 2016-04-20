@@ -47,3 +47,29 @@ class APIBase(wtypes.Base):
         for k in self.as_dict():
             if k not in except_list:
                 setattr(self, k, wsme.Unset)
+
+
+class APIBaseObject(APIBase):
+    @classmethod
+    def build(cls, db_obj):
+        obj = cls()
+        db_obj_dict = db_obj.as_dict()
+        for field in cls._DB_object_class.fields:
+            # Skip fields we do not expose.
+            if not hasattr(obj, field):
+                continue
+            setattr(obj, field, db_obj_dict.get(field, wtypes.Unset))
+        return obj
+
+    def to_db_object(self):
+        new_DB_obj = self._DB_object_class()
+        for field in self._DB_object_class.fields:
+            if not hasattr(self, field):
+                continue
+            setattr(new_DB_obj, field, getattr(self, field))
+        return new_DB_obj
+
+
+class APIBaseList(APIBase):
+    pass
+

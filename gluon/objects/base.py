@@ -49,13 +49,19 @@ class GluonObject(ovoo_base.VersionedObject):
                                            sort_dir=sort_dir,
                                            failed=failed,
                                            period=period)
-        return cls._from_db_opject_list(cls, db_list)
+        return cls._from_db_object_list(cls, db_list)
+
+    @classmethod
+    def get_by_filter(cls, filter):
+        return cls.list(filters=filter)
 
     @classmethod
     def get_by_uuid(cls, uuid):
-        return cls.from_dict_object(cls(),
-                                    cls.db_instance.get_by_uuid(cls.model,
-                                                                uuid))
+        return cls.get_by_filter({'uuid': uuid})
+
+    @classmethod
+    def get_by_name(cls, name):
+        return cls.get_by_filter({'name': name})
 
     @staticmethod
     def from_dict_object(cls, dict):
@@ -67,16 +73,12 @@ class GluonObject(ovoo_base.VersionedObject):
         return cls
 
     @staticmethod
-    def _from_db_opject_list(cls, db_objects):
+    def _from_db_object_list(cls, db_objects):
         return [cls.from_dict_object(cls(), obj) for obj in db_objects]
 
     def create(self):
         """Create a Object in the DB.
         """
-        if self.obj_attr_is_set('id'):
-            raise exception.ObjectActionError(action='create',
-                                              reason='already created')
-
         values = self.obj_get_changes()
         LOG.info(_LI('Dumping CREATE port datastructure  %s') % str(values))
         db_object = self.db_instance.create(self.model, values)

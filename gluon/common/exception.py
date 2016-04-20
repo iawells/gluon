@@ -93,7 +93,7 @@ class Conflict(GluonException):
 
 
 class AlreadyExists(Conflict):
-    message = _("Object of %(cls)s with UUID %(uuid)s already exists.")
+    message = _("Object of %(cls)s with %(key)s \"%(value)s\" already exists.")
 
 
 class NotFound(GluonException):
@@ -101,6 +101,6 @@ class NotFound(GluonException):
     message = _("Object of %(cls)s with UUID %(uuid)s not found.")
 
 
-class NotCreateAble(GluonException):
+class BackendDoesNotExsist(GluonException):
     code = 409
-    message = _("An object of type %(type)s cannot be created for %(object)s")
+    message = _("Backend with name %(name)s does not exsist.")
