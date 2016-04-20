@@ -64,7 +64,7 @@ class APIBaseObject(APIBase):
     def to_db_object(self):
         new_DB_obj = self._DB_object_class()
         for field in self._DB_object_class.fields:
-            if not hasattr(self, field):
+            if not hasattr(self, field) or not getattr(self, field):
                 continue
             setattr(new_DB_obj, field, getattr(self, field))
         return new_DB_obj

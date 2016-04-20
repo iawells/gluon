@@ -44,6 +44,7 @@ class GluonObject(ovoo_base.VersionedObject):
     def list(cls, limit=None, marker=None, sort_key=None,
              sort_dir=None, filters=None, failed=None, period=None):
         db_list = cls.db_instance.get_list(cls.model,
+                                           filters=filters,
                                            limit=limit, marker=marker,
                                            sort_key=sort_key,
                                            sort_dir=sort_dir,
@@ -57,7 +58,9 @@ class GluonObject(ovoo_base.VersionedObject):
 
     @classmethod
     def get_by_uuid(cls, uuid):
-        return cls.get_by_filter({'uuid': uuid})
+        obj = cls.get_by_filter({'uuid': uuid})
+        if obj:
+            return obj[0] 
 
     @classmethod
     def get_by_name(cls, name):

@@ -31,3 +31,9 @@ class Backend(base.GluonObject, base.GluonObjectDictCompat):
               'url': fields.StringField()
               }
 
+    @classmethod
+    def get_by_name(cls, name):
+        obj_list = super(Backend, cls).get_by_name(name)
+        if not obj_list:
+            return
+        return obj_list[0]

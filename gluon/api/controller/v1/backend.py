@@ -66,16 +66,17 @@ class BackendController(rest.RestController):
         """
         return BackendList.build(DB_Backend().list())
 
-    @wsme_pecan.wsexpose(Backend, types.uuid)
-    def get_one(self, uuid):
+    @wsme_pecan.wsexpose(Backend, unicode)
+    def get_one(self, name):
         """Returns information about the given port.
 
         :param uuid: UUID of a port.
         """
-        return Backend(DB_Backend().get_by_uuid(uuid))
+        return Backend.build(DB_Backend.get_by_name(name))
 
     @wsme_pecan.wsexpose(Backend, body=Backend, template='json',
                          status_code=201)
     def post(self, body):
         # Create a backend
-        return Backend.build(gluon_core_manager.create_backend(body.to_db_object())
+        return Backend.build(gluon_core_manager.create_backend(
+            body.to_db_object()))

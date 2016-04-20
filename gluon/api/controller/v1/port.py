@@ -30,6 +30,7 @@ class Port(base.APIBaseObject):
     """
 
     uuid = types.uuid
+    backend_name = unicode
     _DB_object_class = DB_Port
 
 
@@ -55,7 +56,7 @@ class PortController(rest.RestController):
 
         :param port_ident: UUID of a port.
         """
-        return PortList(DB_Port.list())
+        return PortList.build(DB_Port.list())
 
     @wsme_pecan.wsexpose(Port, types.uuid)
     def get_one(self, uuid):
@@ -63,7 +64,7 @@ class PortController(rest.RestController):
 
         :param uuid: UUID of a port.
         """
-        return Port(DB_Port().get_by_uuid(uuid))
+        return Port.build(DB_Port.get_by_uuid(uuid))
 
     @wsme_pecan.wsexpose(Port, unicode,
                          body=Port, template='json',
@@ -75,3 +76,4 @@ class PortController(rest.RestController):
         """
         return Port.build(gluon_core_manager.create_port(backend_name,
                                                          body.to_db_object()))
+

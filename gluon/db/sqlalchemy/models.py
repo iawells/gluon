@@ -66,9 +66,12 @@ class Port(Base):
     __tablename__ = 'ports'
     __table_args__ = (
         schema.UniqueConstraint('uuid', name='uniq_port0uuid'),
+        schema.ForeignKeyConstraint(['backend_name'], ['backends.name'],
+                                    ondelete='CASCADE')
         )
 
     uuid = Column(String(64))
+    backend_name = Column(String(64))
 
 
 class Backend(Base):

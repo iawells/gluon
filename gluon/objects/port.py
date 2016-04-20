@@ -34,6 +34,10 @@ class Port(base.GluonObject, base.GluonObjectDictCompat):
               }
 
     def create(self):
-        if not getattr(self, 'uuid'):
+        if not hasattr(self, 'uuid') or not getattr(self, 'uuid'):
             self.uuid = uuidutils.generate_uuid()
         super(Port, self).create()
+
+    @classmethod
+    def get_by_backend_name(cls, name):
+        return cls.get_by_filter({'backend_name': name})

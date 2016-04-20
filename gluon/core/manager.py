@@ -48,15 +48,12 @@ class Manager():
         backend = DB_Backend.get_by_name(backend_name)
         if not backend:
             raise exception.BackendDoesNotExsist(name=backend_name)
-        port.backend = backend
+        port.backend_name = backend_name
         port.create()
+        return port
 
-    def create_backend(self, name, service_type, url):
-        new_backend = DB_Backend()
-        new_backend.name = name
-        new_backend.service_type = service_type
-        new_backend.url = url
-        new_backend.create()
-        return new_backend
+    def create_backend(self, backend):
+        backend.create()
+        return backend
 
 gluon_core_manager = Manager()
