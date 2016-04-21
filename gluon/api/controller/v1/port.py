@@ -76,4 +76,3 @@ class PortController(rest.RestController):
         """
         return Port.build(gluon_core_manager.create_port(backend_name,
                                                          body.to_db_object()))
-
