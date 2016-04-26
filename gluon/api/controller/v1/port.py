@@ -14,15 +14,15 @@
 
 from pecan import rest
 import wsmeext.pecan as wsme_pecan
-from wsme import types as wtypes
+from gluon.api import types as wtypes
 
-from gluon.api import base
-from gluon.api.controller.v1 import types
+from gluon.api import baseObject
+from gluon.api import types
 from gluon.objects.port import Port as DB_Port
 from gluon.core.manager import gluon_core_manager
 
 
-class Port(base.APIBaseObject):
+class Port(baseObject.APIBaseObject):
     """API representation of a port.
 
     This class enforces type checking and value constraints, and converts
@@ -34,7 +34,7 @@ class Port(base.APIBaseObject):
     _DB_object_class = DB_Port
 
 
-class PortList(base.APIBaseList):
+class PortList(baseObject.APIBaseList):
 
     ports = [Port]
 

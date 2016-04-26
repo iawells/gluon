@@ -1,24 +1,41 @@
 # This is used in Gluon to remember details of bindings - who has bound and who provides
 # the port to be bound to.
 GluonInternalPort:
-    attributes:
-        id:
-            type: uuid
-            required: True
-            primary: True
-        owner:
-            type: GluonService
-        device_id:
-            type: uuid
-        device_owner:
-            # Should have a compute and network service?
-            type: string
-            length: 32
+  api:
+    name: ports
+    parents:
+    - backends
+  attributes:
+    id:
+      type: uuid
+      required: True
+      primary: True
+    owner:
+      type: GluonService
+    device_id:
+      type: uuid
+    device_owner:
+        # Should have a compute and network service?
+      type: string
+      length: 32
+      required: True
 
 GluonService:
-    attributes:
-        name:
-            type: 'string'
-            length: 32
-            required: True
-            primary: True
+  api:
+    name: backends
+    parents:
+    - root
+  attributes:
+    name:
+      type: string
+      length: 32
+      required: True
+      primary: True
+    service_type:
+      type: string
+      length: 32
+      required: True
+    url:
+      type: string
+      length: 32
+      required: True

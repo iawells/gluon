@@ -15,9 +15,9 @@ from pecan import rest
 from oslo_log import log as logging
 import wsmeext.pecan as wsme_pecan
 import wsme
-from gluon.api import base
-from wsme import types as wtypes
-from gluon.api.controller.v1 import types
+from gluon.api import baseObject
+from gluon.api import types as wtypes
+from gluon.api import types
 from gluon.objects.backend import Backend as DB_Backend
 from gluon.api.controller.v1.port import Port, PortController
 from gluon.common import exception
@@ -26,7 +26,7 @@ from gluon.core.manager import gluon_core_manager
 LOG = logging.getLogger(__name__)
 
 
-class Backend(base.APIBaseObject):
+class Backend(baseObject.APIBaseObject):
     """API representation of a Backend.
 
     This class enforces type checking and value constraints, and converts
@@ -40,7 +40,7 @@ class Backend(base.APIBaseObject):
     _DB_object_class = DB_Backend
 
 
-class BackendList(base.APIBaseList):
+class BackendList(baseObject.APIBaseList):
 
     backends = [Backend]
 

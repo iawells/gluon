@@ -13,7 +13,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from gluon.api import base
+from gluon.api import baseObject
 import pecan
 from wsme import types as wtypes
 
@@ -30,7 +30,7 @@ def build_url(resource, resource_args, bookmark=False, base_url=None):
     return template % {'url': base_url, 'res': resource, 'args': resource_args}
 
 
-class Link(base.APIBase):
+class Link(baseObject.APIBase):
     """A link representation."""
 
     href = wtypes.text

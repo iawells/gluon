@@ -17,7 +17,7 @@ from pecan import rest
 import wsmeext.pecan as wsme_pecan
 from wsme import types as wtypes
 from gluon.api import link
-from gluon.api.base import APIBase
+from gluon.api.baseObject import APIBase
 from gluon.api.controller.v1 import port as portAPI
 from gluon.api.controller.v1 import backend as backendAPI
 
@@ -53,8 +53,10 @@ class V1(APIBase):
 class API(rest.RestController):
     """Version 1 API controller root."""
 
+    # TODO remove
     ports = portAPI.PortController()
     backends = backendAPI.BackendController()
+    # TODO remove
 
     @wsme_pecan.wsexpose(V1)
     def get(self):
