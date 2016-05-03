@@ -7,42 +7,28 @@ import sqlalchemy as sa
 from sqlalchemy.ext.declarative import declarative_base
 
 
-class ModelProcessor(object):
-    def __init__(self, *models):
-        self.data = {}
-        for model in models:
-            self.add_model(model)
+class DataBaseModelProcessor(object):
+    def __init__(self):
+        self.db_models = {}
 
     def add_model(self, model):
-            self.data.update(yaml.safe_load(model))
+        self.data = model
 
-    def sqla_models(self, base=None):
+    def build_sqla_models(self, base=None):
         """Make SQLAlchemy classes for each of the elements in the data read"""
 
         if not base:
             base = declarative_base()
+        if not self.data:
+            raise Exception('Cannot create Database Model from empty model.')
 
         def de_camel(s):
             s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', s)
             return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
 
         # Make a model class that we've never thought of before
-        models = []
         for table_name, table_data in self.data.iteritems():
-            primary = []
-            for k, v in table_data['attributes'].iteritems():
-                if 'primary' in v:
-                    primary.append(k)
-                    break
-
-            # If not specified, a UUID is used as the PK
-            if len(primary) == 0:
-                table_data['attributes']['uuid'] = \
-                        {'type': 'string', 'length': 36, 'primary': True,
-                         'required': True}
-                primary = ['uuid']
-
-            table_data['primary'] = primary
+            self.get_primary_key(table_data)
 
         for table_name, table_data in self.data.iteritems():
             try:
@@ -61,10 +47,7 @@ class ModelProcessor(object):
                             tgt_name = col_desc['type']
                             tgt_data = self.data[tgt_name]
 
-                            # Confirm only one PK, we don't do multi-col refs
-                            assert len(tgt_data['primary']) == 1
-                            primary_col = tgt_data['primary'][0]
-
+                            primary_col = tgt_data['primary']
                             repl_col_desc = \
                                 dict(tgt_data['attributes'][primary_col])
 
@@ -74,7 +57,7 @@ class ModelProcessor(object):
 
                             # May still be the local PK if we used to be,
                             # though
-                            if col_desc.get('primary', False):
+                            if col_desc.get('primary'):
                                 repl_col_desc['primary'] = True
 
                             # Set the SQLA col option to make clear what's
@@ -127,10 +110,25 @@ class ModelProcessor(object):
 
                 attrs['__tablename__'] = de_camel(table_name)
 
-                models.append(type(table_name, (base,), attrs))
+                self.db_models[table_name] = type(table_name, (base,), attrs)
             except:
                 print('During processing of table ', table_name,
                       file=sys.stderr)
                 raise
 
-        return self.Base.metadata
+    @classmethod
+    def get_primary_key(cls, table_data):
+        primary = []
+        for k, v in table_data['attributes'].iteritems():
+            if 'primary' in v:
+                primary = k
+                break
+        # If not specified, a UUID is used as the PK
+        if not primary:
+            table_data['attributes']['uuid'] = \
+                    {'type': 'string', 'length': 36, 'primary': True,
+                     'required': True}
+            primary = 'uuid'
+
+        table_data['primary'] = primary
+        return primary

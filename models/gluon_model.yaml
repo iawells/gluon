@@ -3,15 +3,14 @@
 GluonInternalPort:
   api:
     name: ports
-    parents:
-    - backends
+    parent: GluonServiceBackend
   attributes:
     id:
       type: uuid
       required: True
       primary: True
     owner:
-      type: GluonService
+      type: GluonServiceBackend
     device_id:
       type: uuid
     device_owner:
@@ -20,11 +19,10 @@ GluonInternalPort:
       length: 32
       required: True
 
-GluonService:
+GluonServiceBackend:
   api:
     name: backends
-    parents:
-    - root
+    parent: root
   attributes:
     name:
       type: string

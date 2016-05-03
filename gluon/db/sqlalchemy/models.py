@@ -21,7 +21,7 @@ from oslo_config import cfg
 from sqlalchemy import schema
 from sqlalchemy import (Column, Integer, String)
 from sqlalchemy.ext.declarative import declarative_base
-from gluon.common.particleGenerator import models as common_models
+from gluon.common.particleGenerator import generator as particel_generator
 from gluon.common import paths
 
 sql_opts = [
@@ -60,6 +60,4 @@ class GluonBase(models.TimestampMixin, models.ModelBase):
 
 Base = declarative_base(cls=GluonBase)
 
-mp = common_models.build_model_processor()
-
-mp.sqla_models(Base)
+particel_generator.build_sql_models(Base)
