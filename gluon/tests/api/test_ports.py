@@ -18,24 +18,10 @@ test_gluon
 
 Tests for `gluon` module.
 """
-
-from gluon.tests.objects import base
-from gluon.tests.objects import utils
-from gluon.common import exception
+from gluon.tests.api import base
 
 
-class TestPort(base.ObjectTestCase):
+class TestPort(base.APITestCase):
 
-    def test_create(self):
-        port = Port()
-        port.create()
-
-    def test_create_consistency(self):
-        port = utils.create_fake_port(
-            uuid='24c050ab-f357-4a89-97cc-339ed7e00065')
-        self.assertEqual(port.uuid, '24c050ab-f357-4a89-97cc-339ed7e00065')
-
-    def test_already_exists(self):
-        utils.create_fake_port()
-        self.assertRaises(exception.PortAlreadyExists,
-                          utils.create_fake_port)
+    def test_list(self):
+        self.gluonclient.list_ports()

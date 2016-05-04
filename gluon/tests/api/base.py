@@ -11,11 +11,14 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
+from gluonclient import api as gc_api
+from gluon.tests import base
 
 
-def create_fake_port(**kw):
-    fake_port = Port()
-    fake_port.uuid = kw.get('uuid', 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')
-    fake_port.create()
-    # TODO add cleanup
-    return fake_port
+class APITestCase(base.TestCase):
+
+    def setUp(self):
+        super(APITestCase, self).setUp()
+        url = '0:2704'
+        print('Gluon service has to be running on %s' % url)
+        self.gluonclient = gc_api.ClientAPI('http://%s/v1/' % url)

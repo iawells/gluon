@@ -20,6 +20,7 @@ from gluon.api import link
 from gluon.api.baseObject import APIBase
 from gluon.common.particleGenerator.ApiGenerator import APIGenerator
 from gluon.common.particleGenerator import generator as particel_generator
+from gluon.api.controller.v1.backend import BackendController
 
 class V1(APIBase):
     """The representation of the version 1 of the API."""
@@ -52,8 +53,9 @@ class V1(APIBase):
 class API(rest.RestController):
     """Version 1 API controller root."""
 
+    backends_old = BackendController()
+
     def __init__(self):
-        import pdb;pdb.set_trace()
         particel_generator.build_api(self)
 
     @wsme_pecan.wsexpose(V1)

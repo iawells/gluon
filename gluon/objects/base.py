@@ -21,7 +21,7 @@ from oslo_log import log as logging
 LOG = logging.getLogger(__name__)
 
 
-class GluonObject(ovoo_base.VersionedObject):
+class GluonObject(ovoo_base.VersionedObject, ovoo_base.VersionedObjectDictCompat):
     """Base class and object factory.
 
     This forms the base of all objects that can be remoted or instantiated
@@ -35,6 +35,12 @@ class GluonObject(ovoo_base.VersionedObject):
 
     db_instance = dbapi.get_instance()
 
+    @classmethod
+    def class_builder(base_cls, name, db_model):
+        new_cls = type(name, (base_cls,), {})
+        new_cls.db_model = db_model
+        return new_cls
+
     def as_dict(self):
         return dict((k, getattr(self, k))
                     for k in self.fields
@@ -43,7 +49,7 @@ class GluonObject(ovoo_base.VersionedObject):
     @classmethod
     def list(cls, limit=None, marker=None, sort_key=None,
              sort_dir=None, filters=None, failed=None, period=None):
-        db_list = cls.db_instance.get_list(cls.model,
+        db_list = cls.db_instance.get_list(cls.db_model,
                                            filters=filters,
                                            limit=limit, marker=marker,
                                            sort_key=sort_key,
@@ -87,10 +93,3 @@ class GluonObject(ovoo_base.VersionedObject):
         db_object = self.db_instance.create(self.model, values)
         self.from_dict_object(self, db_object)
 
-
-class GluonObjectDictCompat(ovoo_base.VersionedObjectDictCompat):
-    pass
-
-
-class GluonObjectRegistry(ovoo_base.VersionedObjectRegistry):
-    pass

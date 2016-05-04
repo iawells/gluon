@@ -19,13 +19,13 @@ from pecan import rest
 from wsme import types as wtypes
 import wsmeext.pecan as wsme_pecan
 
-from gluon.api import baseObject
+from gluon.api.baseObject import APIBase
 from gluon.api import link
 
 from gluon.api.controller.v1.base import API as v1
 
 
-class Version(baseObject.APIBase):
+class Version(APIBase):
     """An API version representation."""
 
     id = wtypes.text
@@ -43,7 +43,7 @@ class Version(baseObject.APIBase):
         return version
 
 
-class Root(baseObject.APIBase):
+class Root(APIBase):
 
     name = wtypes.text
     """The name of the API"""

@@ -18,8 +18,8 @@ import wsme
 from gluon.api import baseObject
 from gluon.api import types as wtypes
 from gluon.api import types
-from gluon.objects.backend import Backend as DB_Backend
-from gluon.api.controller.v1.port import Port, PortController
+#from gluon.objects.backend import Backend as DB_Backend
+#from gluon.api.controller.v1.port import Port, PortController
 from gluon.common import exception
 from gluon.core.manager import gluon_core_manager
 
@@ -33,11 +33,11 @@ class Backend(baseObject.APIBaseObject):
     between the internal object model and the API representation of a Backend.
     """
 
-    name = wtypes.StringType()
-    service_type = wtypes.StringType()
-    url = wtypes.StringType()
+    #name = wtypes.StringType()
+    #service_type = wtypes.StringType()
+    #url = wtypes.StringType()
 
-    _DB_object_class = DB_Backend
+    #_DB_object_class = DB_Backend
 
 
 class BackendList(baseObject.APIBaseList):
@@ -56,7 +56,7 @@ class BackendList(baseObject.APIBaseList):
 class BackendController(rest.RestController):
     """Version 1 API Backend controller."""
 
-    ports = PortController()
+    #ports = PortController()
 
     @wsme_pecan.wsexpose(BackendList)
     def get_all(self):
