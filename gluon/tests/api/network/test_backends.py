@@ -11,12 +11,18 @@
 #    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 #    License for the specific language governing permissions and limitations
 #    under the License.
-from gluon.tests import base
+
+"""
+test_gluon
+----------------------------------
+
+Tests for `gluon` module.
+"""
+from gluon.tests.api.network import base
 
 
-class APITestCase(base.TestCase):
+class TestBackends(base.NetworkServiceAPITestCase):
 
-    def setUp(self):
-        super(APITestCase, self).setUp()
-        self.gluon_url = '0:2704'
-        print('Gluon service has to be running on %s' % gluon_url)
+    def test_register(self):
+        self.ini
+

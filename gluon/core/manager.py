@@ -54,7 +54,7 @@ class Manager():
         port.create()
         return port
 
-    def create_backend(self, backend):
+    def create_backends(self, backend):
         backend.create()
         return backend
 

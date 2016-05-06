@@ -31,7 +31,7 @@ class Port(baseObject.APIBaseObject):
 
     uuid = types.uuid
     backend_name = unicode
-    _DB_object_class = DB_Port
+    _object_class = DB_Port
 
 
 class PortList(baseObject.APIBaseList):

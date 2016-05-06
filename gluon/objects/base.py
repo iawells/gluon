@@ -90,6 +90,6 @@ class GluonObject(ovoo_base.VersionedObject, ovoo_base.VersionedObjectDictCompat
         """
         values = self.obj_get_changes()
         LOG.info(_LI('Dumping CREATE port datastructure  %s') % str(values))
-        db_object = self.db_instance.create(self.model, values)
+        db_object = self.db_instance.create(self.db_model, values)
         self.from_dict_object(self, db_object)
 

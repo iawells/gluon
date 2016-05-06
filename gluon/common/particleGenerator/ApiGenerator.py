@@ -41,10 +41,10 @@ class APIGenerator(object):
                 # For every entry build a (sub_)api_controller
                 # an APIObject, an APIObject and an APIListObject
                 # and a real object is created
-                real_object = obj_base.GluonObject.class_builder(
+                object_class = obj_base.GluonObject.class_builder(
                     table_name, self.db_models[table_name])
                 api_object_class = APIBaseObject.class_builder(
-                    table_name, real_object)
+                    table_name, object_class)
                 real_object_fields = {}
                 for attribute, attr_value in\
                         table_data['attributes'].iteritems():
@@ -54,7 +54,7 @@ class APIGenerator(object):
                     real_object_fields[attribute] = self.translate_model_to_real_obj_type(
                         attr_value['type'])
 
-                setattr(real_object, 'fields', real_object_fields)
+                setattr(object_class, 'fields', real_object_fields)
                 # api_name
                 api_name = table_data['api']['name']
 

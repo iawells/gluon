@@ -33,9 +33,9 @@ class Backend(baseObject.APIBaseObject):
     between the internal object model and the API representation of a Backend.
     """
 
-    #name = wtypes.StringType()
-    #service_type = wtypes.StringType()
-    #url = wtypes.StringType()
+    name = unicode
+    service_type = unicode
+    url = unicode
 
     #_DB_object_class = DB_Backend
 

@@ -25,3 +25,4 @@ class TestBackends(base.APITestCase):
 
     def test_list(self):
         self.gluonclient.list_backends()
+
