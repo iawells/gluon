@@ -58,8 +58,8 @@ class APIBaseObject(APIBase):
     _object_class = None
 
     @classmethod
-    def class_builder(base_cls, name, object_class):
-        new_cls = type(name, (base_cls,), {})
+    def class_builder(base_cls, name, object_class, attributes):
+        new_cls = type(name, (base_cls,), attributes)
         new_cls._object_class = object_class
         return new_cls
 
@@ -95,8 +95,7 @@ class APIBaseList(APIBase):
 
     @classmethod
     def class_builder(base_cls, name, list_name, API_object_class):
-        new_cls = type(name, (base_cls,), {})
-        setattr(new_cls, list_name, [API_object_class])
+        new_cls = type(name, (base_cls,), {list_name: [API_object_class]})
         new_cls._list_name = list_name
         new_cls._API_object_class = API_object_class
         return new_cls
@@ -105,7 +104,7 @@ class APIBaseList(APIBase):
     def build(cls, db_obj_list):
         obj = cls()
         setattr(obj, cls._list_name,
-                [cls.object_class.build(db_obj)
+                [cls._API_object_class.build(db_obj)
                  for db_obj in db_obj_list])
         return obj
 
@@ -117,7 +116,7 @@ class RootObjectController(rest.RestController):
 
     @classmethod
     def class_builder(base_cls, name, API_object_class,
-                      primary_key_type=types.uuid):
+                      primary_key_type):
         new_cls = type(name, (base_cls,), {})
         new_cls._list_object_class = APIBaseList.class_builder(name + 'List',
                                                                name,
@@ -125,13 +124,14 @@ class RootObjectController(rest.RestController):
         new_cls._API_object_class = API_object_class
         new_cls._primary_key_type = primary_key_type
 
-        @wsme_pecan.wsexpose(new_cls._list_object_class)
+        @wsme_pecan.wsexpose(new_cls._list_object_class, template='json')
         def get_all(self):
             return self._list_object_class.build(
                 self._list_object_class.get_object_class().list())
         new_cls.get_all = classmethod(get_all)
 
-        @wsme_pecan.wsexpose(new_cls._API_object_class, new_cls._primary_key_type)
+        @wsme_pecan.wsexpose(new_cls._API_object_class, new_cls._primary_key_type,
+                             template='json')
         def get_one(self, key):
             return self._API_object_class.build(
                 self._API_object_class.get_object_class().get_by_primary_key(key))
@@ -153,37 +153,45 @@ class RootObjectController(rest.RestController):
 
 class SubObjectController(RootObjectController):
 
-    # TODO copy again from rootobject !!!!
-    _parent_identifier_type = None
-    _object_class = None
-    _list_object_class = None
-    _object_class = None
-    _primary_key_type = None
-
     @classmethod
-    def class_builder(base_cls, name, object_class,
+    def class_builder(base_cls, name, object_class, primary_key_type,
                       parent_identifier_type,
-                      primary_key_type=types.uuid):
+                      parent_attribute_name):
         new_cls = super(SubObjectController, base_cls).class_builder(
             name, object_class, primary_key_type)
         new_cls._parent_identifier_type = parent_identifier_type
+        new_cls._parent_attribute_name = parent_attribute_name
+
+        @wsme_pecan.wsexpose(new_cls._list_object_class, new_cls._parent_identifier_type,
+                             template='json')
+        def get_all(self, _parent_identifier):
+            filters = {self._parent_attribute_name: _parent_identifier}
+            return self._list_object_class.build(
+                self._list_object_class.get_object_class().list(
+                    filters=filters))
+        new_cls.get_all = classmethod(get_all)
+
+        @wsme_pecan.wsexpose(new_cls._API_object_class, 
+                             new_cls._parent_identifier_type,
+                             new_cls._primary_key_type,
+                             template='json')
+        def get_one(self, parent_identifier, key):
+            filters = {self._parent_attribute_name: _parent_identifier}
+            return self._API_object_class.build(
+                self._API_object_class.get_object_class(
+                ).get_by_primary_key(key, filters))
+        new_cls.get_one = classmethod(get_one)
+
+        @wsme_pecan.wsexpose(new_cls._API_object_class, new_cls._parent_identifier_type,
+                             body=new_cls._API_object_class, template='json',
+                             status_code=201)
+        def post(self, parent_identifier, body):
+            call_func = getattr(gluon_core_manager, 'create_%s' % self.__name__,
+                                None)
+            if not call_func:
+                raise Exception('create_%s is not implemented' % self.__name__)
+            return self._API_object_class.build(call_func(parent_identifier,
+                                                          body.to_db_object()))
+        new_cls.post = classmethod(post)
+
         return new_cls
-
-    @wsme_pecan.wsexpose(_list_object_class, _parent_identifier_type)
-    def get_all(self, _parent_identifier):
-        filters = {self.parent_name: _parent_identifier}
-        return self._list_object_class.build(
-            self._list_object_class.get_object_class().list(
-                filters=filters))
-
-    @wsme_pecan.wsexpose(_object_class, _parent_identifier_type,
-                         body=_object_class, template='json',
-                         status_code=201)
-    def post(self, _parent_identifier, body):
-        call_func = getattr(gluon_core_manager, 'create_%s' % self.__name__,
-                            None)
-        if not call_func:
-            # TODO
-            pass
-        return self._object_class.build(call_func(_parent_identifier,
-                                                  body.to_db_object()))

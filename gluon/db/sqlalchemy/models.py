@@ -41,7 +41,9 @@ db_options.set_defaults(cfg.CONF, _DEFAULT_SQL_CONNECTION, 'gluon.sqlite')
 
 class GluonBase(models.TimestampMixin, models.ModelBase):
 
-    id = Column(Integer, primary_key=True)
+    @classmethod
+    def get_primary_key_type(cls):
+        return cls._primary_key
 
     def as_dict(self):
         d = {}

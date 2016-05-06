@@ -68,7 +68,7 @@ def _paginate_query(model, limit=None, marker=None, sort_key=None,
                     sort_dir=None, query=None):
     if not query:
         query = model_query(model)
-    sort_keys = ['id']
+    sort_keys = [model.get_primary_key_type()]
     if sort_key and sort_key not in sort_keys:
         sort_keys.insert(0, sort_key)
     query = db_utils.paginate_query(query, model, limit, sort_keys,

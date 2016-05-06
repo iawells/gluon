@@ -17,11 +17,8 @@ from gluon.tests.api import base
 
 class NetworkServiceAPITestCase(base.APITestCase):
 
-    def setUp(self):
-        super(APITestCase, self).setUp()
-        self.gluonNetworkServiceClient = gc_api.NetworkServiceAPI
-
     def initialize_client(self, backend_name, url):
-        self.gluonNetworkServiceClient =-self.gluonNetworkServiceClient(self.gluon_url,
-                                                                        backend_name,
-                                                                        url)
+        self.gluonNetworkServiceClient = gc_api.NetworkServiceAPI(
+            'http://%s/v1/' % self.gluon_url,
+            backend_name,
+            url)

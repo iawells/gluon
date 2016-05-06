@@ -24,5 +24,6 @@ from gluon.tests.api.network import base
 class TestBackends(base.NetworkServiceAPITestCase):
 
     def test_register(self):
-        self.ini
+        self.initialize_client('Test', 'http://dummyUrl/')
+        self.assertTrue(self.gluonNetworkServiceClient._registered)
 

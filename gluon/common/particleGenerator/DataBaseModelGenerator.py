@@ -8,6 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 
 class DataBaseModelProcessor(object):
+
     def __init__(self):
         self.db_models = {}
 
@@ -83,13 +84,16 @@ class DataBaseModelProcessor(object):
                         # definition
                         if col_desc.get('primary', False):
                             options['primary_key'] = True
+                            # Save the information about the primary key as well
+                            # in the object
+                            attrs['_primary_key'] = col_name
 
                         required = col_desc.get('required', False)
                         options['nullable'] = not required
 
                         if col_desc['type'] == 'string':
                             attrs[col_name] = sa.Column(sa.String(
-                                 col_desc['length']), *args, **options)
+                                col_desc['length']), *args, **options)
                         elif col_desc['type'] == 'integer':
                             attrs[col_name] = sa.Column(sa.Integer(), *args,
                                                         **options)
@@ -98,8 +102,8 @@ class DataBaseModelProcessor(object):
                                                         **options)
                         elif col_desc['type'] == 'enum':
                             attrs[col_name] = sa.Column(
-                                 sa.Enum(*col_desc['values']), *args,
-                                 **options)
+                                sa.Enum(*col_desc['values']), *args,
+                                **options)
                         else:
                             raise Exception('Unknown column type %s' %
                                             col_desc['type'])
@@ -107,7 +111,9 @@ class DataBaseModelProcessor(object):
                         print('During processing of attribute ', col_name,
                               file=sys.stderr)
                         raise
-
+                if not '_primary_key' in attrs:
+                    raise Exception("One and only one primary key has to "
+                                    "be given to each column")
                 attrs['__tablename__'] = de_camel(table_name)
 
                 self.db_models[table_name] = type(table_name, (base,), attrs)
@@ -126,8 +132,8 @@ class DataBaseModelProcessor(object):
         # If not specified, a UUID is used as the PK
         if not primary:
             table_data['attributes']['uuid'] = \
-                    {'type': 'string', 'length': 36, 'primary': True,
-                     'required': True}
+                {'type': 'string', 'length': 36, 'primary': True,
+                 'required': True}
             primary = 'uuid'
 
         table_data['primary'] = primary

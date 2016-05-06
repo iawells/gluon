@@ -3,7 +3,9 @@
 GluonInternalPort:
   api:
     name: ports
-    parent: GluonServiceBackend
+    parent:
+      type: GluonServiceBackend
+      attribute: owner
   attributes:
     id:
       type: uuid
@@ -17,12 +19,14 @@ GluonInternalPort:
         # Should have a compute and network service?
       type: string
       length: 32
+      length: 32
       required: True
 
 GluonServiceBackend:
   api:
     name: backends
-    parent: root
+    parent:
+      type: root
   attributes:
     name:
       type: string

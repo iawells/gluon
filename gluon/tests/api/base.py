@@ -19,4 +19,4 @@ class APITestCase(base.TestCase):
     def setUp(self):
         super(APITestCase, self).setUp()
         self.gluon_url = '0:2704'
-        print('Gluon service has to be running on %s' % gluon_url)
+        print('Gluon service has to be running on %s' % self.gluon_url)

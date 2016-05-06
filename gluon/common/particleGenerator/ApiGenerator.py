@@ -33,28 +33,32 @@ class APIGenerator(object):
         self.data = model
 
     def create_api(self, root):
-        sub_controllers = {}
+        controllers = {}
         if not self.data:
             raise Exception('Cannot create API from empty model.')
         for table_name, table_data in self.data.iteritems():
             try:
                 # For every entry build a (sub_)api_controller
                 # an APIObject, an APIObject and an APIListObject
-                # and a real object is created
-                object_class = obj_base.GluonObject.class_builder(
-                    table_name, self.db_models[table_name])
-                api_object_class = APIBaseObject.class_builder(
-                    table_name, object_class)
+                # and a RealObject is created
                 real_object_fields = {}
+                api_object_fields = {}
                 for attribute, attr_value in\
                         table_data['attributes'].iteritems():
                     api_type = self.translate_model_to_api_type(
                         attr_value['type'])
-                    setattr(api_object_class, attribute, api_type)
+                    api_object_fields[attribute] = api_type
                     real_object_fields[attribute] = self.translate_model_to_real_obj_type(
                         attr_value['type'])
 
-                setattr(object_class, 'fields', real_object_fields)
+                # Real object
+                object_class = obj_base.GluonObject.class_builder(
+                    table_name, self.db_models[table_name], real_object_fields)
+
+                # API object
+                api_object_class = APIBaseObject.class_builder(
+                    table_name, object_class, api_object_fields)
+
                 # api_name
                 api_name = table_data['api']['name']
 
@@ -63,34 +67,36 @@ class APIGenerator(object):
                     self.get_primary_key_type(table_data))
 
                 # parent_identifier_type
-                parent = table_data['api']['parent']
-                parent_identifier_type = None
+                parent = table_data['api']['parent']['type']
                 if parent != 'root':
                     parent_identifier_type = self.data[parent]['api']['name']
+                    parent_attribute_name =\
+                        table_data['api']['parent']['attribute']
                     new_controller_class = SubObjectController.class_builder(
                         api_name, api_object_class, primary_key_type,
-                        parent_identifier_type)
+                        parent_identifier_type, parent_attribute_name)
                 else:
                     new_controller_class = RootObjectController.class_builder(
                         api_name, api_object_class, primary_key_type)
 
-                new_controller = new_controller_class()
+                # The childs have to be instantized before the
+                # parents so lets make a dict
                 if parent == 'root':
-                    setattr(root, api_name, new_controller)
+                    controllers[api_name: new_controller_class]
                 else:
-                    if 'childs' not in self.data[parent]:
+                    if 'childs' not in controllers.get(parent_attribute_name, {}):
                         self.data[parent]['childs'] = []
                     self.data[parent]['childs'].append(
                         {'name': api_name,
                          'object': new_controller})
-                sub_controllers[table_name] = new_controller
+                controllers[table_name] = new_controller
             except:
                 print('During processing of table ' + table_name)
                 raise
 
         # Now add all childs since the roots are there now
         for table_name, table_data in self.data.iteritems():
-            controller = sub_controllers[table_name]
+            controller = controllers[table_name]
             for child in table_data.get('childs', []):
                 setattr(controller, child['name'], child['object'])
 

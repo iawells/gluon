@@ -23,12 +23,6 @@ LOG = logging.getLogger(__name__)
 
 class GluonObject(ovoo_base.VersionedObject, ovoo_base.VersionedObjectDictCompat):
     """Base class and object factory.
-
-    This forms the base of all objects that can be remoted or instantiated
-    via RPC. Simply defining a class that inherits from this base class
-    will make it remotely instantiatable. Objects should implement the
-    necessary "get" classmethod routines as well as "save" object methods
-    as appropriate.
     """
 
     VERSION = '1.0'
@@ -36,9 +30,10 @@ class GluonObject(ovoo_base.VersionedObject, ovoo_base.VersionedObjectDictCompat
     db_instance = dbapi.get_instance()
 
     @classmethod
-    def class_builder(base_cls, name, db_model):
-        new_cls = type(name, (base_cls,), {})
+    def class_builder(base_cls, name, db_model, fields):
+        new_cls = type(name, (base_cls,), {'fields': fields})
         new_cls.db_model = db_model
+        ovoo_base.VersionedObjectRegistry.register(new_cls)
         return new_cls
 
     def as_dict(self):
@@ -63,10 +58,23 @@ class GluonObject(ovoo_base.VersionedObject, ovoo_base.VersionedObjectDictCompat
         return cls.list(filters=filter)
 
     @classmethod
+    def get_by_primary_key(cls, key, filter={}):
+        pk_type = cls.db_model.get_primary_key_type()
+        obj = cls.get_by_filter(filter.update({pk_type: key}))
+        if obj:
+            return obj[0]
+
+    @classmethod
+    def get_by_parent_and_primary_key(self, parent_identifier,
+                                      key):
+        pk_type = cls.db_model.get_primary_key_type()
+        pk_type = cls.db_model.get_primary_key_type()
+
+    @classmethod
     def get_by_uuid(cls, uuid):
         obj = cls.get_by_filter({'uuid': uuid})
         if obj:
-            return obj[0] 
+            return obj[0]
 
     @classmethod
     def get_by_name(cls, name):
