@@ -141,15 +141,31 @@ class RootObjectController(rest.RestController):
                              body=new_cls._API_object_class, template='json',
                              status_code=201)
         def post(self, body):
-            call_func = getattr(gluon_core_manager, 'create_%s' % self.__name__,
-                                None)
-            if not call_func:
-                raise Exception('create_%s is not implemented' % self.__name__)
-            return self._API_object_class.build(call_func(body.to_db_object()))
+            return self._API_object_class.build(self.call_gluon_core_manager('create', body.to_db_object()))
         new_cls.post = classmethod(post)
+
+        @wsme_pecan.wsexpose(new_cls._API_object_class,
+                             body=new_cls._API_object_class, template='json')
+        def update(self, body):
+            return self._API_object_class.build(self.call_gluon_core_manager('update', body.to_db_object()))
+        new_cls.post = classmethod(post)
+
+        @wsme_pecan.wsexpose(new_cls._API_object_class, new_cls._primary_key_type,
+                             template='json')
+        def destroy(self, key):
+            return self.call_gluon_core_manager('destroy', key)
+        new_cls.destroy = classmethod(destroy)
 
         return new_cls
 
+    @classmethod
+    def call_gluon_core_manager(cls, func, *args):
+        call_func = getattr(gluon_core_manager, '%s_%s' % (func,
+                                                           cls.__name__),
+                            None)
+        if not call_func:
+            raise Exception('%s_%s is not implemented' % (func, cls.__name__))
+        return call_func(*args)
 
 class SubObjectController(RootObjectController):
 

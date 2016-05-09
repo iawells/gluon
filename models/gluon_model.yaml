@@ -4,8 +4,9 @@ GluonInternalPort:
   api:
     name: ports
     parent:
-      type: GluonServiceBackend
-      attribute: owner
+      type: root
+      #type: GluonServiceBackend
+      #attribute: owner
   attributes:
     id:
       type: uuid

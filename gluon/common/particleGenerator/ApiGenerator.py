@@ -18,6 +18,7 @@ from oslo_versionedobjects import fields
 from gluon.api.baseObject import RootObjectController
 from gluon.api.baseObject import SubObjectController
 from gluon.api.baseObject import APIBaseObject
+from gluon.core.manager import gluon_core_manager
 from gluon.common.particleGenerator.DataBaseModelGenerator import DataBaseModelProcessor
 from gluon.api import types
 from gluon.objects import base as obj_base
@@ -55,6 +56,9 @@ class APIGenerator(object):
                 object_class = obj_base.GluonObject.class_builder(
                     table_name, self.db_models[table_name], real_object_fields)
 
+                #register in the gluon_core_manager
+                gluon_core_manager.gluon_objects[table_name] = object_class
+
                 # API object
                 api_object_class = APIBaseObject.class_builder(
                     table_name, object_class, api_object_fields)
@@ -81,24 +85,25 @@ class APIGenerator(object):
 
                 # The childs have to be instantized before the
                 # parents so lets make a dict
-                if parent == 'root':
-                    controllers[api_name: new_controller_class]
-                else:
+                if parent != 'root':
                     if 'childs' not in controllers.get(parent_attribute_name, {}):
                         self.data[parent]['childs'] = []
                     self.data[parent]['childs'].append(
                         {'name': api_name,
                          'object': new_controller})
-                controllers[table_name] = new_controller
+                controllers[table_name] = new_controller_class
             except:
                 print('During processing of table ' + table_name)
                 raise
 
         # Now add all childs since the roots are there now
+        # And init the controller since all childs are there now
         for table_name, table_data in self.data.iteritems():
             controller = controllers[table_name]
             for child in table_data.get('childs', []):
-                setattr(controller, child['name'], child['object'])
+                setattr(controller, child['name'], child['object']())
+            api_name = table_data['api']['name']
+            setattr(root, api_name, controller())
 
     def get_primary_key_type(self, table_data):
         primary_key = DataBaseModelProcessor.get_primary_key(

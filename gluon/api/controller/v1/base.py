@@ -36,24 +36,12 @@ class V1(APIBase):
         v1.id = "v1"
         v1.links = [link.Link.make_link('self', pecan.request.host_url,
                                         'v1', '', bookmark=True),
-                    link.Link.make_link('describedby',
-                                        'TODO',
-                                        bookmark=True, type='text/html')
                     ]
-#        v1.cpulse = [link.Link.make_link('self', pecan.request.host_url,
-#                                         'cpulse', ''),
-#                     link.Link.make_link('bookmark',
-#                                         pecan.request.host_url,
-#                                         'cpulse', '',
-#                                         bookmark=True)
-#                     ]
         return v1
 
 
 class API(rest.RestController):
     """Version 1 API controller root."""
-
-    backends_old = BackendController()
 
     def __init__(self):
         particel_generator.build_api(self)
