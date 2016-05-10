@@ -144,17 +144,19 @@ class RootObjectController(rest.RestController):
             return self._API_object_class.build(self.call_gluon_core_manager('create', body.to_db_object()))
         new_cls.post = classmethod(post)
 
-        @wsme_pecan.wsexpose(new_cls._API_object_class,
-                             body=new_cls._API_object_class, template='json')
-        def update(self, body):
-            return self._API_object_class.build(self.call_gluon_core_manager('update', body.to_db_object()))
-        new_cls.post = classmethod(post)
+        @wsme_pecan.wsexpose(new_cls._API_object_class, new_cls._primary_key_type,
+                             unicode,
+                             body=unicode, template='json')
+        def put(self, key, operation, body):
+            return self._API_object_class.build(self.call_gluon_core_manager(operation,
+                                                                             key, body))
+        new_cls.put = classmethod(put)
 
         @wsme_pecan.wsexpose(new_cls._API_object_class, new_cls._primary_key_type,
                              template='json')
-        def destroy(self, key):
-            return self.call_gluon_core_manager('destroy', key)
-        new_cls.destroy = classmethod(destroy)
+        def delete(self, key):
+            return self.call_gluon_core_manager('delete', key)
+        new_cls.delete = classmethod(delete)
 
         return new_cls
 
