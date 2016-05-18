@@ -11,12 +11,14 @@ queued_build_api = False
 
 # Singleton generator
 def load_model():
+        global model
         if not model:
             # for f in pkg_resources.resource_listdir(__name__, 'models'):
             #    with pkg_resources.resource_stream(f) as fd:
-            with open('/home/enikher/workspace/gluon-dev/models/gluon_model.yaml',
+            #with open('/home/enikher/workspace/gluon-dev/models/gluon_model.yaml',
+            with open('/Users/tomhambleton/work/code/gluon-env/gluon/models/gluon_model.yaml',
+            #with open('/Users/tomhambleton/work/code/gluon-env/gluon/models/proton_model.yaml',
                       'r') as fd:
-                    global model
                     model = yaml.safe_load(fd)
 
 
@@ -39,3 +41,7 @@ def build_api(root):
         APIGeneratorInstance = APIGenerator(DataBaseModelGeneratorInstance.db_models)
         APIGeneratorInstance.add_model(model)
         APIGeneratorInstance.create_api(root)
+
+def getDataBaseGeneratorInstance():
+    global DataBaseModelGeneratorInstance
+    return DataBaseModelGeneratorInstance

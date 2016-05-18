@@ -17,6 +17,7 @@ from oslo_versionedobjects import base as ovoo_base
 from oslo_log._i18n import _LI
 from gluon.db import api as dbapi
 from oslo_log import log as logging
+from gluon.common import exception
 
 LOG = logging.getLogger(__name__)
 
@@ -60,9 +61,12 @@ class GluonObject(ovoo_base.VersionedObject, ovoo_base.VersionedObjectDictCompat
     @classmethod
     def get_by_primary_key(cls, key, filter={}):
         pk_type = cls.db_model.get_primary_key_type()
-        obj = cls.get_by_filter(filter.update({pk_type: key}))
+        filter[pk_type] = key
+        obj = cls.get_by_filter(filter)
         if obj:
             return obj[0]
+        else:
+            raise exception.NotFound(cls=cls.db_model.__name__, key=key)
 
     @classmethod
     def get_by_parent_and_primary_key(self, parent_identifier,
@@ -75,6 +79,8 @@ class GluonObject(ovoo_base.VersionedObject, ovoo_base.VersionedObjectDictCompat
         obj = cls.get_by_filter({'uuid': uuid})
         if obj:
             return obj[0]
+        else:
+            raise exception.NotFound(cls=cls.db_model.__name__, key=uuid)
 
     @classmethod
     def get_by_name(cls, name):
@@ -100,4 +106,3 @@ class GluonObject(ovoo_base.VersionedObject, ovoo_base.VersionedObjectDictCompat
         LOG.info(_LI('Dumping CREATE port datastructure  %s') % str(values))
         db_object = self.db_instance.create(self.db_model, values)
         self.from_dict_object(self, db_object)
-

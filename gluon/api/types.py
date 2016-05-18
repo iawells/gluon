@@ -74,7 +74,6 @@ class UuidType(wtypes.UserType):
             return None
         return UuidType.validate(value)
 
-
 class BooleanType(wtypes.UserType):
     """A simple boolean type."""
 
@@ -142,8 +141,14 @@ class Text(wtypes.UserType):
         if isinstance(value, basestring):
             return
         raise ValueError(_("Expected String, got '%s'" % value)) 
-    
 
+def create_enum_type(*values):
+    unicode_values = []
+    for v in values:
+        unicode_values.append(unicode(v))
+    return wtypes.Enum(wtypes.text, *unicode_values)
+
+int_type = wtypes.IntegerType()
 uuid = UuidType()
 name = NameType()
 uuid_or_name = MultiType(UuidType, NameType)

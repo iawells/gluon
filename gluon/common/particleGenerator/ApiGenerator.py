@@ -47,10 +47,10 @@ class APIGenerator(object):
                 for attribute, attr_value in\
                         table_data['attributes'].iteritems():
                     api_type = self.translate_model_to_api_type(
-                        attr_value['type'])
+                        attr_value['type'], attr_value.get('values'))
                     api_object_fields[attribute] = api_type
                     real_object_fields[attribute] = self.translate_model_to_real_obj_type(
-                        attr_value['type'])
+                        attr_value['type'], attr_value.get('values'))
 
                 # Real object
                 object_class = obj_base.GluonObject.class_builder(
@@ -68,7 +68,7 @@ class APIGenerator(object):
 
                 # primary_key_type
                 primary_key_type = self.translate_model_to_api_type(
-                    self.get_primary_key_type(table_data))
+                    self.get_primary_key_type(table_data), None)
 
                 # parent_identifier_type
                 parent = table_data['api']['parent']['type']
@@ -110,7 +110,7 @@ class APIGenerator(object):
             table_data)
         return table_data['attributes'][primary_key]['type']
 
-    def translate_model_to_real_obj_type(self, model_type):
+    def translate_model_to_real_obj_type(self, model_type, values):
         # first make sure it is not a foreign key
         if model_type in self.data:
             # if it is we point to the primary key type type of this key
@@ -121,9 +121,15 @@ class APIGenerator(object):
             return fields.UUIDField(nullable=False)
         if model_type == 'string':
             return fields.StringField()
+        if model_type == 'enum':
+            return fields.EnumField(values)
+        if model_type == 'integer':
+            return fields.IntegerField()
+        if model_type == 'boolean':
+            return fields.BooleanField()
         raise Exception("Type %s not known." % model_type)
 
-    def translate_model_to_api_type(self, model_type):
+    def translate_model_to_api_type(self, model_type, values):
         # first make sure it is not a foreign key
         if model_type in self.data:
             # if it is we point to the primary key type type of this key
@@ -134,4 +140,10 @@ class APIGenerator(object):
             return types.uuid
         if model_type == 'string':
             return unicode
+        if model_type == 'enum':
+            return types.create_enum_type(*values)
+        if model_type == 'integer':
+            return types.int_type
+        if model_type == 'boolean':
+            return types.boolean
         raise Exception("Type %s not known." % model_type)

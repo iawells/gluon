@@ -33,6 +33,22 @@ class Manager():
     def get_gluon_object(self, name):
         return self.gluon_objects[name]
 
+    def create_vpnports(self, port):
+        port.create()
+        return port
+
+    def create_baseports(self, port):
+        port.create()
+        return port
+
+    def create_vpns(self, vpn):
+        vpn.create()
+        return vpn
+
+    def create_vpnafconfigs(self, vpnafconfig):
+        vpnafconfig.create()
+        return vpnafconfig
+
     def create_ports(self, port):
         owner = port.owner
         LOG.debug('Creating a new port for backend %s' % owner)

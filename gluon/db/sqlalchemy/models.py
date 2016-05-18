@@ -23,6 +23,7 @@ from sqlalchemy import (Column, Integer, String)
 from sqlalchemy.ext.declarative import declarative_base
 from gluon.common.particleGenerator import generator as particel_generator
 from gluon.common import paths
+from gluon.sync_etcd.log import logupdate
 
 sql_opts = [
     cfg.StrOpt('mysql_engine',
@@ -51,6 +52,7 @@ class GluonBase(models.TimestampMixin, models.ModelBase):
             d[c.name] = self[c.name]
         return d
 
+    @logupdate
     def save(self, session=None):
         import gluon.db.sqlalchemy.api as db_api
 

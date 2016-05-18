@@ -15,6 +15,13 @@ class DataBaseModelProcessor(object):
     def add_model(self, model):
         self.data = model
 
+    def get_table_class(self, table_name):
+        try:
+            return self.db_models[table_name]
+        except ValueError as e:
+            raise Exception('Unknown table name %s' % table_name)
+
+
     def build_sqla_models(self, base=None):
         """Make SQLAlchemy classes for each of the elements in the data read"""
 
@@ -115,6 +122,7 @@ class DataBaseModelProcessor(object):
                     raise Exception("One and only one primary key has to "
                                     "be given to each column")
                 attrs['__tablename__'] = de_camel(table_name)
+                attrs['__name__'] = table_name
 
                 self.db_models[table_name] = type(table_name, (base,), attrs)
             except:

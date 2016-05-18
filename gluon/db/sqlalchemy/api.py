@@ -127,4 +127,14 @@ class Connection(api.Connection):
         try:
             return query.one()
         except sqlalchemy.orm.exc.NoResultFound:
-            raise exception.NotFound(cls=model.__name__, uuid=uuid)
+            raise exception.NotFound(cls=model.__name__, key=uuid)
+
+    def get_by_primary_key(self, model, key):
+        pk_type = model.get_primary_key_type()
+        query = model_query(model)
+        filter = { pk_type: key }
+        query = query.filter_by(**filter)
+        try:
+            return query.one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            raise exception.NotFound(cls=model.__name__, key=key)

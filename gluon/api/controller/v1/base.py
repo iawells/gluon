@@ -20,7 +20,6 @@ from gluon.api import link
 from gluon.api.baseObject import APIBase
 from gluon.common.particleGenerator.ApiGenerator import APIGenerator
 from gluon.common.particleGenerator import generator as particel_generator
-from gluon.api.controller.v1.backend import BackendController
 
 class V1(APIBase):
     """The representation of the version 1 of the API."""

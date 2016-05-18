@@ -1,0 +1,127 @@
+# This is the minimum required port for Gluon-connectivity to work.
+ProtonBasePort:
+    api:
+      name: baseports
+      parent:
+        type: root
+    attributes:
+        id:
+            type: uuid
+            required: True
+            primary: 'True'
+        mac_address:
+            type: 'string'
+            length: 17
+            required: True
+            validate: mac_address
+        admin_state_up:
+            type: 'enum'
+            required: True
+            values:
+                - 'UP'
+                - 'DOWN'
+        status:
+            type: 'enum'
+            required: True
+            values:
+                - 'ACTIVE'
+                - 'DOWN'
+        vnic_type:
+            type: enum
+            required: true
+            values:
+               - 'virtual'
+               - 'direct'
+               - 'macvtap'
+               - 'sriov'
+               - 'whole-dev'
+        vm_id:
+            type: 'uuid'
+        host_id:
+            type: 'string'
+            length: 32
+        vif_details:
+            type: 'string' # what are we going to use, JSON?
+            length: 32
+        vif_type:
+            type: 'string'
+            length: 32
+        ipaddress:
+            type: 'string'
+            length: 64
+            validate: 'ipv4address'
+        subnet_prefix:
+            type: 'integer'
+            values:
+                - '1-31'
+        gateway:
+            type: 'string'
+            length: 64
+            validate: 'ipv4address'
+        mtu:
+            type: 'integer'
+            required: True
+        vlan_transparency:
+            type: 'boolean'
+            required: True
+        tenant_id:
+            type: 'uuid'
+
+# TODO this would be inheritance in a more sane arrangement.
+VPNPort:
+    api:
+      name: vpnports
+      parent:
+        type: root
+    attributes:
+        id:
+            type: 'ProtonBasePort'
+            required: True
+            primary: True
+        vpn_instance:
+            type: 'VpnInstance'
+            required: True
+
+VpnInstance:
+    api:
+      name: vpns
+      parent:
+        type: root
+    attributes:
+        vpn_instance_name:
+            required: True
+            type: string
+            length: 32
+        description:
+            type: string
+            length: 255
+        ipv4_family:
+            type: VpnAfConfig
+        ipv6_family:
+            type: VpnAfConfig
+        route_distinguishers:
+            type: string
+            length: 32
+
+VpnAfConfig:
+    api:
+      name: vpnafconfigs
+      parent:
+        type: root
+    attributes:
+        vrf_rt_value:
+            type: string
+            length: 32
+        vrf_rt_type:
+            type: enum
+            values:
+                - export_extcommunity
+                - import_extcommunity
+                - both
+
+        import_route_policy:
+            type: string
+            length: 32
+        export_route_policy:
+            type: string
+            length: 32

@@ -98,7 +98,7 @@ class AlreadyExists(Conflict):
 
 class NotFound(GluonException):
     code = 404
-    message = _("Object of %(cls)s with UUID %(uuid)s not found.")
+    message = _("Object of %(cls)s with Primay Key %(key)s not found.")
 
 
 class BackendDoesNotExsist(GluonException):
