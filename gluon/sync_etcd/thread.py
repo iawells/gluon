@@ -70,6 +70,9 @@ class SyncThread(threading.Thread):
 
 
 def start_sync_thread():
+    """
+    Start the SyncThread.  This should be called in the main function.
+    """
     SyncData.sync_thread = SyncThread(SyncData.sync_queue)
     SyncData.sync_thread_running = True
     SyncData.sync_thread.start()

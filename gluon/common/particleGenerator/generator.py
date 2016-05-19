@@ -7,19 +7,21 @@ APIGeneratorInstance = None
 model = None
 sql_model_build = False
 queued_build_api = False
+package_name = "unknown"
 
+def set_package(package):
+    global package_name
+    package_name = package
 
 # Singleton generator
 def load_model():
         global model
         if not model:
-            # for f in pkg_resources.resource_listdir(__name__, 'models'):
-            #    with pkg_resources.resource_stream(f) as fd:
-            #with open('/home/enikher/workspace/gluon-dev/models/gluon_model.yaml',
-            with open('/Users/tomhambleton/work/code/gluon-env/gluon/models/gluon_model.yaml',
-            #with open('/Users/tomhambleton/work/code/gluon-env/gluon/models/proton_model.yaml',
-                      'r') as fd:
-                    model = yaml.safe_load(fd)
+            model = {}
+            for f in pkg_resources.resource_listdir(package_name, 'models'):
+                f = "models/" + f
+                with pkg_resources.resource_stream(package_name, f) as fd:
+                    model.update(yaml.safe_load(fd))
 
 
 def build_sql_models(base):

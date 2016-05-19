@@ -1,0 +1,44 @@
+# This is the minimum required port for Gluon-connectivity to work.
+VpnInstance:
+    api:
+      name: vpns
+      parent:
+        type: root
+    attributes:
+        vpn_instance_name:
+            required: True
+            type: string
+            length: 32
+        description:
+            type: string
+            length: 255
+        ipv4_family:
+            type: VpnAfConfig
+        ipv6_family:
+            type: VpnAfConfig
+        route_distinguishers:
+            type: string
+            length: 32
+
+VpnAfConfig:
+    api:
+      name: vpnafconfigs
+      parent:
+        type: root
+    attributes:
+        vrf_rt_value:
+            type: string
+            length: 32
+        vrf_rt_type:
+            type: enum
+            values:
+                - export_extcommunity
+                - import_extcommunity
+                - both
+
+        import_route_policy:
+            type: string
+            length: 32
+        export_route_policy:
+            type: string
+            length: 32

@@ -19,7 +19,7 @@ from wsme import types as wtypes
 from pecan import rest
 import wsmeext.pecan as wsme_pecan
 from gluon.api import types
-from gluon.core.manager import gluon_core_manager
+from gluon.core.manager import get_api_manager
 
 
 class APIBase(wtypes.Base):
@@ -141,30 +141,27 @@ class RootObjectController(rest.RestController):
                              body=new_cls._API_object_class, template='json',
                              status_code=201)
         def post(self, body):
-            return self._API_object_class.build(self.call_gluon_core_manager('create', body.to_db_object()))
+            return self._API_object_class.build(self.call_api_manager('create', body.to_db_object()))
         new_cls.post = classmethod(post)
 
         @wsme_pecan.wsexpose(new_cls._API_object_class, new_cls._primary_key_type,
                              unicode,
                              body=unicode, template='json')
         def put(self, key, operation, body):
-            return self._API_object_class.build(self.call_gluon_core_manager(operation,
-                                                                             key, body))
+            return self._API_object_class.build(self.call_api_manager(operation, key, body))
         new_cls.put = classmethod(put)
 
         @wsme_pecan.wsexpose(new_cls._API_object_class, new_cls._primary_key_type,
                              template='json')
         def delete(self, key):
-            return self.call_gluon_core_manager('delete', key)
+            return self.call_api_manager('delete', key)
         new_cls.delete = classmethod(delete)
 
         return new_cls
 
     @classmethod
-    def call_gluon_core_manager(cls, func, *args):
-        call_func = getattr(gluon_core_manager, '%s_%s' % (func,
-                                                           cls.__name__),
-                            None)
+    def call_api_manager(cls, func, *args):
+        call_func = getattr(get_api_manager(), '%s_%s' % (func, cls.__name__), None)
         if not call_func:
             raise Exception('%s_%s is not implemented' % (func, cls.__name__))
         return call_func(*args)
@@ -204,7 +201,7 @@ class SubObjectController(RootObjectController):
                              body=new_cls._API_object_class, template='json',
                              status_code=201)
         def post(self, parent_identifier, body):
-            call_func = getattr(gluon_core_manager, 'create_%s' % self.__name__,
+            call_func = getattr(get_api_manager(), 'create_%s' % self.__name__,
                                 None)
             if not call_func:
                 raise Exception('create_%s is not implemented' % self.__name__)

@@ -18,7 +18,7 @@ from oslo_versionedobjects import fields
 from gluon.api.baseObject import RootObjectController
 from gluon.api.baseObject import SubObjectController
 from gluon.api.baseObject import APIBaseObject
-from gluon.core.manager import gluon_core_manager
+from gluon.core.manager import get_api_manager
 from gluon.common.particleGenerator.DataBaseModelGenerator import DataBaseModelProcessor
 from gluon.api import types
 from gluon.objects import base as obj_base
@@ -56,8 +56,8 @@ class APIGenerator(object):
                 object_class = obj_base.GluonObject.class_builder(
                     table_name, self.db_models[table_name], real_object_fields)
 
-                #register in the gluon_core_manager
-                gluon_core_manager.gluon_objects[table_name] = object_class
+                #register in the API Manager instance
+                get_api_manager().gluon_objects[table_name] = object_class
 
                 # API object
                 api_object_class = APIBaseObject.class_builder(

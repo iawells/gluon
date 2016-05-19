@@ -13,6 +13,8 @@
 #    under the License.
 from gluon.common import exception
 from oslo_log import log as logging
+from gluon.core.manager import ApiManager
+
 from gluon.backends import base as BackendBase
 # This has to be dne to get the Database Models
 # build before the API is build.
@@ -22,39 +24,26 @@ from gluon.db.sqlalchemy import models
 LOG = logging.getLogger(__name__)
 logger = LOG
 
-class MyData:
-    pass
 
-ManagerData = MyData()
-ManagerData.manager = None
-
-#
-# Base class for ApiManager
-#
-class ApiManager(object):
-
+class ProtonManager(ApiManager):
     def __init__(self):
-        # TODO
-        # backend_manager = BackendBase.Manager(app.config)
         self.gluon_objects = {}
+        super(ProtonManager, self).__init__()
 
-    def get_gluon_object(self, name):
-        return self.gluon_objects[name]
+    def create_vpnports(self, port):
+        port.create()
+        return port
+
+    def create_baseports(self, port):
+        port.create()
+        return port
+
+    def create_vpns(self, vpn):
+        vpn.create()
+        return vpn
+
+    def create_vpnafconfigs(self, vpnafconfig):
+        vpnafconfig.create()
+        return vpnafconfig
 
 
-def register_api_manager(manager):
-    """
-    Each service should create a subclass from manager to handle the routing from the API.
-    This manager should be registered before
-    :param manager:
-    """
-    ManagerData.manager = manager
-
-def get_api_manager():
-    """
-    Return registered API Manager instance
-    :return:
-    """
-    if ManagerData.manager is None:
-        LOG.error("No manager registered!")
-    return ManagerData.manager

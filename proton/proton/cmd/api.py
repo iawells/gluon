@@ -23,6 +23,7 @@ from oslo_config import cfg
 
 from gluon.common import service
 from gluon.api import app as api_app
+from gluon.sync_etcd.thread import start_sync_thread
 import gluon.common.config
 from gluon.common.particleGenerator.generator import set_package
 
@@ -31,16 +32,14 @@ LOG = logging.getLogger(__name__)
 # Set the package name before class generation.
 # The generator will look in the models directory of the package for the yaml files.
 #
-set_package("gluon")
+set_package("proton")
 #
 # Register API Manager for this service.
 # Loading these modules will trigger the generation of the API and DB classes
 #
 from gluon.core.manager import register_api_manager
-from gluon.cmd.manager import GluonManager
-register_api_manager(GluonManager())
-
-
+from proton.cmd.manager import ProtonManager
+register_api_manager(ProtonManager())
 
 def main():
     service.prepare_service(sys.argv)
@@ -62,4 +61,5 @@ def main():
     else:
         LOG.info(_LI('serving on http://%(host)s:%(port)s') %
                  dict(host=host, port=port))
+    start_sync_thread()   # Only for proton
     srv.serve_forever()
