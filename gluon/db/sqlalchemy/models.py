@@ -24,6 +24,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from gluon.common.particleGenerator import generator as particel_generator
 from gluon.common import paths
 from gluon.sync_etcd.log import logupdate
+from gluon.sync_etcd.log import logdelete
+
 
 sql_opts = [
     cfg.StrOpt('mysql_engine',
@@ -60,6 +62,14 @@ class GluonBase(models.TimestampMixin, models.ModelBase):
             session = db_api.get_session()
 
         super(GluonBase, self).save(session)
+
+    @logdelete
+    def delete(self, session=None):
+        import gluon.db.sqlalchemy.api as db_api
+        if session is None:
+            session = db_api.get_session()
+        session.delete(self)
+        session.flush()
 
 
 Base = declarative_base(cls=GluonBase)

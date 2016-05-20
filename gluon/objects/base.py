@@ -14,6 +14,7 @@
 
 from oslo_versionedobjects import exception
 from oslo_versionedobjects import base as ovoo_base
+from pecan import Response
 from oslo_log._i18n import _LI
 from gluon.db import api as dbapi
 from oslo_log import log as logging
@@ -106,3 +107,24 @@ class GluonObject(ovoo_base.VersionedObject, ovoo_base.VersionedObjectDictCompat
         LOG.info(_LI('Dumping CREATE port datastructure  %s') % str(values))
         db_object = self.db_instance.create(self.db_model, values)
         self.from_dict_object(self, db_object)
+
+    @classmethod
+    def update(cls, key, values):
+        """Delete a Object in the DB.
+        """
+        db_object = cls.db_instance.get_by_primary_key(cls.db_model, key)
+        db_object.update(values)
+        db_object.save()
+        return cls.from_dict_object(cls(), db_object)
+
+    @classmethod
+    def delete(cls, key):
+        """Delete a Object in the DB.
+        """
+        db_object = cls.db_instance.get_by_primary_key(cls.db_model, key)
+        db_object.delete()
+
+
+
+
+

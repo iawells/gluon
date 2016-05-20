@@ -30,20 +30,47 @@ class ProtonManager(ApiManager):
         self.gluon_objects = {}
         super(ProtonManager, self).__init__()
 
-    def create_vpnports(self, port):
+    def create_vpnports(self, obj_class, port):
         port.create()
         return port
 
-    def create_baseports(self, port):
+    def update_vpnports(self, obj_class, key, new_values):
+        return obj_class.update(key, new_values)
+
+    def delete_vpnports(self, obj_class, key):
+        return obj_class.delete(key)
+
+    def create_baseports(self, obj_class, port):
         port.create()
         return port
 
-    def create_vpns(self, vpn):
+    def update_baseports(self, obj_class, key, new_values):
+        return obj_class.update(key, new_values)
+
+    def delete_baseports(self, obj_class, key):
+        return obj_class.delete(key)
+
+    def create_vpns(self, obj_class, vpn):
         vpn.create()
         return vpn
 
-    def create_vpnafconfigs(self, vpnafconfig):
+    def update_vpns(self, obj_class, key, new_values):
+        return obj_class.update(key, new_values)
+
+    def delete_vpns(self, obj_class, key):
+        return obj_class.delete(key)
+
+    def create_vpnafconfigs(self, obj_class, vpnafconfig):
         vpnafconfig.create()
         return vpnafconfig
+
+    def update_vpnafconfigs(self, obj_class, key, new_values):
+        return obj_class.update(key, new_values)
+
+    def delete_vpnafconfigs(self, obj_class, key):
+        return obj_class.delete(key)
+
+
+
 
 

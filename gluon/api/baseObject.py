@@ -145,14 +145,14 @@ class RootObjectController(rest.RestController):
         new_cls.post = classmethod(post)
 
         @wsme_pecan.wsexpose(new_cls._API_object_class, new_cls._primary_key_type,
-                             unicode,
-                             body=unicode, template='json')
+                                     unicode,
+                                     body=unicode, template='json')
         def put(self, key, operation, body):
             return self._API_object_class.build(self.call_api_manager(operation, key, body))
         new_cls.put = classmethod(put)
 
         @wsme_pecan.wsexpose(new_cls._API_object_class, new_cls._primary_key_type,
-                             template='json')
+                                 template='json')
         def delete(self, key):
             return self.call_api_manager('delete', key)
         new_cls.delete = classmethod(delete)
@@ -161,10 +161,11 @@ class RootObjectController(rest.RestController):
 
     @classmethod
     def call_api_manager(cls, func, *args):
+        objClass = cls._API_object_class.get_object_class()
         call_func = getattr(get_api_manager(), '%s_%s' % (func, cls.__name__), None)
         if not call_func:
             raise Exception('%s_%s is not implemented' % (func, cls.__name__))
-        return call_func(*args)
+        return call_func(objClass, *args)
 
 class SubObjectController(RootObjectController):
 

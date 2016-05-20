@@ -41,17 +41,32 @@ class GluonManager(ApiManager):
             raise exception.BackendDoesNotExsist(name=owner)
         port.create()
         return port
+    #
+    # /ports/<key>/update
+    #
+    def update_ports(self, obj_class, key, new_values):
+        return obj_class.update(key, new_values)
+
+    def delete_ports(self, obj_class, key):
+        return obj_class.delete(key)
 
     def create_backends(self, backend):
         backend.create()
         return backend
+    #
+    # /backends/<key>/update
+    #
+    def update_backends(self, obj_class, key, new_values):
+        return obj_class.update(key, new_values)
 
-    def destroy_backends(self, backend_name):
-        raise NotImplementedError
+    def delete_backends(self, obj_class, key):
+        return obj_class.delete(key)
 
     def _get_backend_of_port(self, uuid):
         return self.get_gluon_object('GluonInternalPort').get_by_uuid(uuid).owner
-
+    #
+    # /ports/<key>/bind
+    #
     def bind_ports(self, uuid, args):
         binding_profile = {
             'pci_profile': args['pci_profile'],
@@ -99,7 +114,9 @@ class GluonManager(ApiManager):
 
         # TODO required?  Do we trust the backend to set this?
         ports[port_id]['zone'] = zone
-
+    #
+    # /ports/<key>/unbind
+    #
     def unbind_ports(self, uuid):
         backend = self._get_backend_of_port(uuid)
         # Not very distributed-fault-tolerant, but no retries yet
